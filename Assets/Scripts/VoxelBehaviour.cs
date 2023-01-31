@@ -126,6 +126,6 @@ public class VoxelBehaviour : MonoBehaviour
         {
             renderer = gameObject.AddComponent<MeshRenderer>();
         }
-        renderer.material = material;
+        renderer.material = new Material(Shader.Find("Particles/Standard Surface"));
     }
 }

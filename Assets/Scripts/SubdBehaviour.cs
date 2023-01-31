@@ -11,7 +11,7 @@ public class SubdBehaviour : MonoBehaviour
     public Material material;
     [Range(0.1f,5)]
     public float extrudeHeight = 1f;
-    [Range(0,12)]
+    [Range(0,50)]
     public int iteration = 2;
     private Mesh mesh;
     private HDMesh hdMesh;
@@ -56,7 +56,7 @@ public class SubdBehaviour : MonoBehaviour
     }
     public void BehaviourB()
     {
-        hdMesh = HDMeshSubdivision.subdivide_mesh_grid(hdMesh, 2, 2);
+        hdMesh = HDMeshSubdivision.subdivide_mesh_grid(hdMesh, 2, 1);
     }
 
     public void CustomizedBehaviour()
