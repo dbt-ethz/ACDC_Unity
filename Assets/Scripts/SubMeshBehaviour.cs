@@ -7,11 +7,11 @@ using HD;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SubMeshBehaviour : MonoBehaviour
 {
-    [Range(0, 10)]
+    [Range(0, 50)]
     public int floors = 5;
-    [Range(1, 10)]
+    [Range(1, 50)]
     public int nU = 5;
-    [Range(1, 10)]
+    [Range(1, 50)]
     public int nV = 3;
     [Range(0, 1)]
     public float windowRatio = 0.5f;

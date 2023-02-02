@@ -11,7 +11,7 @@ public class SubdBehaviour : MonoBehaviour
     public Material material;
     [Range(0.1f,5)]
     public float extrudeHeight = 1f;
-    [Range(0,50)]
+    [Range(0,10)]
     public int iteration = 2;
     private Mesh mesh;
     private HDMesh hdMesh;
@@ -20,7 +20,7 @@ public class SubdBehaviour : MonoBehaviour
     {
         Debug.Log("start is called");
         InitMesh();
-        List<string> functionStrings = new List<string>(){ "CustomizedBehaviour, CustomizedB" };
+        //List<string> subdivideMethods = new List<string>(){ "BehaviourA, CustomizedB" };
         //mesh.MarkDynamic();
     }
 
@@ -29,11 +29,16 @@ public class SubdBehaviour : MonoBehaviour
     {
         Debug.Log("Inspector causes this Update");
         InitHDMesh();
-        for (int i = 0; i < iteration; i++)
+        List<string> subdivideMethods = new List<string>() { "BehaviourA", "BehaviourB" };
+        for (int i = 0; i < iteration*2;)
         {
-            MethodInfo theMethod = GetType().GetMethod("BehaviourB");
-            theMethod.Invoke(this, null);
-            //CustomizedBehaviour();
+            foreach(string method in subdivideMethods)
+            {
+                MethodInfo theMethod = GetType().GetMethod(method);
+                theMethod.Invoke(this, null);
+                i++;
+                Debug.Log(i);
+            }
         }
 
         Debug.Log(hdMesh.FacesCount());
@@ -56,7 +61,7 @@ public class SubdBehaviour : MonoBehaviour
     }
     public void BehaviourB()
     {
-        hdMesh = HDMeshSubdivision.subdivide_mesh_grid(hdMesh, 2, 1);
+        hdMesh = HDMeshSubdivision.subdivide_mesh_extrude_tapered(hdMesh, extrudeHeight, 0.5f);
     }
 
     public void CustomizedBehaviour()
