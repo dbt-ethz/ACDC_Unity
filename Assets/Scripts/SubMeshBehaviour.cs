@@ -39,12 +39,22 @@ public class SubMeshBehaviour : MonoBehaviour
 
 
     }
+    private void ExecuteSubd()
+    {
+        HDMesh block = new HDMesh();
+        Color color = Color.white;
+        HDMeshFactory.AddQuad(block, 0, 0, 0, 100, 0, 0, 100, 0, 50, 0, 0, 50, color, true);
+
+        block = HDMeshSubdivision.subdivide_mesh_grid(block, 5, 3);
+        HDMeshSubdivision.subdivide_mesh_extrude(block, 0);
+
+    }
     public HDMesh InitHDMesh()
     {
         HDMesh newMesh = new HDMesh();
         Color color = Color.white;
-        HDMeshFactory.AddBox(newMesh, 0, 0, 0, 1, 1, 1, color);
-        //HDMeshFactory.AddQuad(newMesh, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, color);
+        //HDMeshFactory.AddBox(newMesh, 0, 0, 0, 1, 1, 1, color);
+        HDMeshFactory.AddQuad(newMesh, 0, 0, 0, 100, 0, 0, 100, 0, 50, 0, 0, 50, color, true);
         //HDMeshFactory.AddTriangle(newMesh, 0, 0, 0, 1, 0, 0, 0, 1, 0, color);
 
         return newMesh;
@@ -61,13 +71,5 @@ public class SubMeshBehaviour : MonoBehaviour
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         meshFilter.mesh = mesh;
-
-        //// init mesh renderer
-        //MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
-        //if (renderer == null)
-        //{
-        //    renderer = this.gameObject.AddComponent<MeshRenderer>();
-        //}
-        //renderer.material = new Material(Shader.Find("Particles/Standard Surface"));
     }
 }

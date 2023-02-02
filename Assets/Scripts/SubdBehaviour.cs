@@ -86,13 +86,13 @@ public class SubdBehaviour : MonoBehaviour
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         meshFilter.mesh = mesh;
 
-        // init mesh renderer
-        MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
-        if (renderer == null)
-        {
-            renderer = this.gameObject.AddComponent<MeshRenderer>();
-        }
-        renderer.material = material;
+        //// init mesh renderer
+        //MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
+        //if (renderer == null)
+        //{
+        //    renderer = this.gameObject.AddComponent<MeshRenderer>();
+        //}
+        //renderer.material = material;
     }
 
 }
