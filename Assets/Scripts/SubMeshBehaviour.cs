@@ -22,31 +22,6 @@ public class SubMeshBehaviour : MonoBehaviour
     {
         Debug.Log("start is called");
         InitMesh();
-
-        //// create multiple HDMesh
-        //HDMesh hdMesh1 = InitHDMesh();
-        //HDMesh hdMesh2 = InitHDMesh();
-        //for (int i = 0; i < hdMesh2.VertexCount(); i++)
-        //{
-        //    hdMesh2.Vertices[i] += new Vector3(2, 0, 0);
-        //}
-        //List<HDMesh> hdMeshes = new List<HDMesh>() { hdMesh1, hdMesh2 };
-
-        //// fill list of HDMesh as unity sub mesh
-        //HDMesh.FillUnitySubMeshes(mesh, hdMeshes);
-
-        //List<HDMesh> hdMeshes = ExecuteSubd();
-        //HDMesh.FillUnitySubMeshes(mesh, hdMeshes);
-
-        //// assign materials
-        //Material[] mats = new Material[hdMeshes.Count];
-        //for(int i = 0; i < mats.Length; i++)
-        //{
-        //    mats[i] = new Material(Shader.Find("Particles/Standard Surface"));
-        //    mats[i].color = Utils.RandomColor();
-        //}
-        //MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
-        //renderer.materials = mats;
     }
 
     private void OnValidate()
