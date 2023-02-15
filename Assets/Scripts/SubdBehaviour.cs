@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using HD;
+using Mola;
 using System.Reflection;
 using System;
 
-[ExecuteInEditMode]
+//[ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SubdBehaviour : MonoBehaviour
 {
@@ -13,51 +13,41 @@ public class SubdBehaviour : MonoBehaviour
     public float extrudeHeight = 1f;
     [Range(0,10)]
     public int iteration = 2;
-
     private Mesh mesh;
 
-    void Start()
-    {
-        //InitMesh();
-    }
-
-    // this will be called everytime something changes in inspector
     private void OnValidate()
     {
         Debug.Log("Inspector causes this Update");
         InitMesh();
 
-        HDMesh hdMesh = InitHDMesh();
+        MolaMesh molaMesh = InitMolaMesh();
 
         List<string> subdivideMethods = new List<string>() { "BehaviourA", "BehaviourB" };
         for (int i = 0; i < iteration; i++)
         {
             MethodInfo theMethod = GetType().GetMethod(subdivideMethods[i % subdivideMethods.Count]);
-            hdMesh = (HDMesh)theMethod.Invoke(this, new object[] { hdMesh });
+            molaMesh = (MolaMesh)theMethod.Invoke(this, new object[] { molaMesh });
         }
 
-        Debug.Log($"face count: {hdMesh.FacesCount()}");
-        hdMesh.FillUnityMesh(mesh);
+        Debug.Log($"face count: {molaMesh.FacesCount()}");
+        molaMesh.FillUnityMesh(mesh);
     }
-
-    public HDMesh InitHDMesh()
+    public MolaMesh InitMolaMesh()
     {
-        HDMesh newMesh = new HDMesh();
+        MolaMesh newMesh = new MolaMesh();
         Color color = Color.white;
-        HDMeshFactory.AddBox(newMesh, 0, 0, 0, 1, 1, 1, color);
-        //HDMeshFactory.AddTriangle(newMesh, 0, 0, 0, 1, 0, 0, 0, 1, 0, color);
+        MeshFactory.AddBox(newMesh, 0, 0, 0, 1, 1, 1, color);
+        //MeshFactory.AddTriangle(newMesh, 0, 0, 0, 1, 0, 0, 0, 1, 0, color);
         return newMesh;
     }
-
-    public HDMesh BehaviourA(HDMesh hdMesh)
+    public MolaMesh BehaviourA(MolaMesh molaMesh)
     {
-        return HDMeshSubdivision.subdivide_mesh_extrude(hdMesh, extrudeHeight);
+        return MeshSubdivision.subdivide_mesh_extrude(molaMesh, extrudeHeight);
     }
-    public HDMesh BehaviourB(HDMesh hdMesh)
+    public MolaMesh BehaviourB(MolaMesh molaMesh)
     {
-        return HDMeshSubdivision.subdivide_mesh_extrude_tapered(hdMesh, extrudeHeight, 0.5f);
+        return MeshSubdivision.subdivide_mesh_extrude_tapered(molaMesh, extrudeHeight, 0.5f);
     }
-
     private void InitMesh()
     {
         // init mesh filter
@@ -78,5 +68,4 @@ public class SubdBehaviour : MonoBehaviour
         }
         renderer.material = new Material(Shader.Find("Particles/Standard Surface"));
     }
-
 }

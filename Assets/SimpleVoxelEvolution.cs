@@ -1,19 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using HD;
+using Mola;
 public class SimpleVoxelEvolution : MonoBehaviour
 {
     int nX=16;
     int nY=7;
     int nZ=16;
     Mesh mesh;
-    HDGrid<bool> grid;
-    HDGrid<bool> backupGrid;
+    MolaGrid<bool> grid;
+    MolaGrid<bool> backupGrid;
     float fitness;
     int[][] nbs;
     float[] distances;
-    HDDirectedGraph graph;
+    MolaDirectedGraph graph;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,7 +29,7 @@ public class SimpleVoxelEvolution : MonoBehaviour
 
     public void InitGraph()
     {
-        graph = new HDDirectedGraph(grid.Count);
+        graph = new MolaDirectedGraph(grid.Count);
         for (int i = 0; i < nbs.Length; i++)
         {
             int[] nodeNbs = nbs[i];
@@ -102,14 +102,14 @@ public class SimpleVoxelEvolution : MonoBehaviour
         grid[i2] = newValue;
     }
 
-    void CopyStates(HDGrid<bool> grid, HDGrid<bool> copyTarget)
+    void CopyStates(MolaGrid<bool> grid, MolaGrid<bool> copyTarget)
     {
         grid.CopyTo((System.Array)copyTarget.Values,0);
     }
 
-    HDGrid<bool> InitGrid(int nX, int nY, int nZ)
+    MolaGrid<bool> InitGrid(int nX, int nY, int nZ)
     {
-        HDGrid<bool> grid = new HDGrid<bool>(nX,nY,nZ);
+        MolaGrid<bool> grid = new MolaGrid<bool>(nX,nY,nZ);
         for (int i = 0; i < grid.Count; i++)
         {
             grid[i] = Random.value > 0.5;
@@ -176,7 +176,7 @@ public class SimpleVoxelEvolution : MonoBehaviour
             MutateForBetter();
         }
        
-        HDMesh myMesh = new HDMesh();
+        MolaMesh myMesh = new MolaMesh();
         Color color = Color.white;
         Color colorFacade = Color.white;
         colorFacade.a = 0.5f;
@@ -207,40 +207,40 @@ public class SimpleVoxelEvolution : MonoBehaviour
                         if (flagFacade) { 
                         if (x == 0|| !grid[x - 1, y, z])
                         {
-                                //HDMeshFactory.AddQuadX0(myMesh, x, y, z, colorFacade);
-                                HDMeshFactory.AddBox(myMesh, x, y+0.1f, z+0.1f, x+0.1f, y+1, z+1-0.1f, colorFacade);
+                                //MolaMeshFactory.AddQuadX0(myMesh, x, y, z, colorFacade);
+                                MeshFactory.AddBox(myMesh, x, y+0.1f, z+0.1f, x+0.1f, y+1, z+1-0.1f, colorFacade);
                         }
                        
                         if (x==nX-1||!grid[x + 1, y, z])
                         {
-                                //HDMeshFactory.AddQuadX1(myMesh, x, y, z, colorFacade);
-                                HDMeshFactory.AddBox(myMesh, x+1-0.1f, y + 0.1f, z + 0.1f, x + 1, y + 1, z + 1 - 0.1f, colorFacade);
+                                //MolaMeshFactory.AddQuadX1(myMesh, x, y, z, colorFacade);
+                                MeshFactory.AddBox(myMesh, x+1-0.1f, y + 0.1f, z + 0.1f, x + 1, y + 1, z + 1 - 0.1f, colorFacade);
 
                             }
                             if (z == 0 || !grid[x, y, z - 1])
                         {
-                                //HDMeshFactory.AddQuadZ0(myMesh, x, y, z, colorFacade);
-                                HDMeshFactory.AddBox(myMesh, x + 0.1f, y + 0.1f, z , x + 1 -0.1f, y + 1, z + 0.1f, colorFacade);
+                                //MeshFactory.AddQuadZ0(myMesh, x, y, z, colorFacade);
+                                MeshFactory.AddBox(myMesh, x + 0.1f, y + 0.1f, z , x + 1 -0.1f, y + 1, z + 0.1f, colorFacade);
 
                             }
                             if (z == nZ - 1 || !grid[x, y, z + 1])
                         {
-                                //HDMeshFactory.AddQuadZ1(myMesh, x, y, z, colorFacade);
-                                HDMeshFactory.AddBox(myMesh, x + 0.1f, y + 0.1f, z+1-0.1f, x + 1 - 0.1f, y + 1, z + 1, colorFacade);
+                                //MeshFactory.AddQuadZ1(myMesh, x, y, z, colorFacade);
+                                MeshFactory.AddBox(myMesh, x + 0.1f, y + 0.1f, z+1-0.1f, x + 1 - 0.1f, y + 1, z + 1, colorFacade);
 
                             }
                         }
                         if (y==nY-1||!grid[x, y+1, z])
                         {
-                            //HDGridToMesh.AddQuadY1(myMesh, x, y, z, Color.green);
+                            //MolaGridToMesh.AddQuadY1(myMesh, x, y, z, Color.green);
                         }
 
                         /*if (y==0||!grid[x, y - 1, z])
                         //{
                             
                         //}*/
-                        HDMeshFactory.AddBox(myMesh, x+o, y, z+o, x + 1-o, y + 0.2f, z + 1-o, cColor);
-                        //HDGridToMesh.AddQuadY0(myMesh, x, y, z, cColor,true);
+                        MeshFactory.AddBox(myMesh, x+o, y, z+o, x + 1-o, y + 0.2f, z + 1-o, cColor);
+                        //MolaGridToMesh.AddQuadY0(myMesh, x, y, z, cColor,true);
 
                         
                     }

@@ -1,44 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using HD;
+using Mola;
 using System;
 using Random = UnityEngine.Random;
 
 [ExecuteInEditMode]
 public class VoxelBehaviour : MonoBehaviour
 {
-    public Material material;
-
     public int nX = 100;
     public int nY = 100;
     public int nZ = 100;
     [Range(0, 50)]
     public float radius = 0;
 
-    private HDGrid<bool> grid;
+    private MolaGrid<bool> grid;
     private Mesh mesh;
-    private HDMesh hdMesh;
 
     void Start()
     {
         Debug.Log("start is called");
-        InitMesh();
+        //InitMesh();
     }
 
     private void OnValidate()
     {
-        Debug.Log("Inspector causes this Update");
+        InitMesh();
         InitGrid();
         SphereGrid(new Vector3(20, 20, 20), radius);
-        hdMesh = VoxelMesh(Color.red);
-        //hdMesh.SeparateVertices();
-        hdMesh.FillUnityMesh(mesh);
+        MolaMesh molaMesh = UtilsGrid.VoxelMesh(grid, Color.red);
+        Debug.Log($"quad count: {molaMesh.FacesCount()}");
+        molaMesh.FillUnityMesh(mesh);
     }
 
     private void InitGrid()
     {
-        grid = new HDGrid<bool>(nX, nY, nZ);
+        grid = new MolaGrid<bool>(nX, nY, nZ);
     }
 
     private void RandomGrid()
@@ -66,10 +63,9 @@ public class VoxelBehaviour : MonoBehaviour
         }
     }
 
-    private HDGrid<bool> CustomizedGrid(int nX, int nY, int nZ)
+    private MolaGrid<bool> CustomizedGrid(int nX, int nY, int nZ)
     {
-        HDGrid<bool> grid = new HDGrid<bool>(nX, nY, nZ);
-        // customization
+        MolaGrid<bool> grid = new MolaGrid<bool>(nX, nY, nZ);
         for (int x = 10; x < 20; x++)
         {
             for (int y = 0; y < 30; y++)
@@ -83,31 +79,11 @@ public class VoxelBehaviour : MonoBehaviour
         return grid;
     }
 
-    private HDGrid<bool> GyroidGrid(int nX, int nY, int nZ)
+    private MolaGrid<bool> GyroidGrid(int nX, int nY, int nZ)
     {
         throw new NotImplementedException();
     }
 
-    public HDMesh VoxelMesh(Color color)
-    {
-        HDMesh myMesh = new HDMesh();
-        for (int x = 0; x < nX; x++)
-        {
-            for (int y = 0; y < nY; y++)
-            {
-                for (int z = 0; z < nZ; z++)
-                {
-                    if (grid[x, y, z])
-                    {
-                        Color colorFacade = color;
-                        HDMeshFactory.AddBox(myMesh, x, y, z, x + 1, y + 1f, z + 1, colorFacade);
-
-                    }
-                }
-            }
-        }
-        return myMesh;
-    }
     private void InitMesh()
     {
         // init mesh filter

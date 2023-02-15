@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "com.dbt.hdgeom": {
-      "version": "file:C:/Users/testu/Documents/GitHub/HDUnity",
+    "com.dbt.mola": {
+      "version": "file:C:/D/GitHub/HDUnity",
       "depth": 0,
       "source": "local",
       "dependencies": {}
