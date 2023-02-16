@@ -35,7 +35,7 @@ public class SubMeshBehaviour : MonoBehaviour
         Material[] mats = new Material[molaMeshes.Count];
         for (int i = 0; i < mats.Length; i++)
         {
-            mats[i] = new Material(Shader.Find("Particles/Standard Surface"));
+            mats[i] = new Material(Shader.Find("Standard"));
             mats[i].color = UtilsMath.RandomColor();
         }
         MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
