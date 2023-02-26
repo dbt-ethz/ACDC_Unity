@@ -131,24 +131,37 @@ namespace StarterAssets
 
 		private void CameraRotation()
 		{
-			// if there is an input
-			if (_input.look.sqrMagnitude >= _threshold)
+            if (IsRightMouseButtonDown()) // Wen
+            {
+				Cursor.lockState = CursorLockMode.Locked;
+            }
+			if (IsRightMouseButtonUp()) // Wen 
 			{
-				//Don't multiply mouse input by Time.deltaTime
-				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-				
-				_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
-				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
-
-				// clamp our pitch rotation
-				_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
-
-				// Update Cinemachine camera target pitch
-				CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
-
-				// rotate the player left and right
-				transform.Rotate(Vector3.up * _rotationVelocity);
+				Cursor.visible = true;
+				Cursor.lockState = CursorLockMode.None;
 			}
+			if(Cursor.lockState == CursorLockMode.Locked) // Wen
+            {
+				// if there is an input
+				if (_input.look.sqrMagnitude >= _threshold)
+				{
+					//Don't multiply mouse input by Time.deltaTime
+					float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
+
+					_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
+					_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
+
+					// clamp our pitch rotation
+					_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
+
+					// Update Cinemachine camera target pitch
+					CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
+
+					// rotate the player left and right
+					transform.Rotate(Vector3.up * _rotationVelocity);
+				}
+			}
+			
 		}
 
 		private void Move()
@@ -263,6 +276,23 @@ namespace StarterAssets
 
 			// when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
 			Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
+		}
+		bool IsRightMouseButtonDown()
+		{
+#if ENABLE_INPUT_SYSTEM
+			return Mouse.current != null ? Mouse.current.rightButton.isPressed : false;
+#else
+            return Input.GetMouseButtonDown(1);
+#endif
+		}
+
+		bool IsRightMouseButtonUp()
+		{
+#if ENABLE_INPUT_SYSTEM
+			return Mouse.current != null ? !Mouse.current.rightButton.isPressed : false;
+#else
+            return Input.GetMouseButtonUp(1);
+#endif
 		}
 	}
 }
