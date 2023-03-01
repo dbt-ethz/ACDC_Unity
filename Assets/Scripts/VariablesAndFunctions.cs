@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class VariablesAndFunctions : MonoBehaviour
 {
+    // 02
     int myInt = 5;
-    //05 public int myInt;
+    bool myBool = true;
+    string myString = "hello world!";
+
+    //06 public int myInt;
+
     void Start()
     {
         // 01 start and update
@@ -16,12 +21,15 @@ public class VariablesAndFunctions : MonoBehaviour
         result = myInt * 2;
         Debug.Log(result);
 
-        // 04 change variables
+        // 05 change variables
         myInt = 10;
 
         // 03 functions
         result = MultiplyByTwo(myInt);
         Debug.Log(result);
+
+        // 04
+        MultiplyByThree(myInt);
     }
 
     // 01 start and update
@@ -40,5 +48,11 @@ public class VariablesAndFunctions : MonoBehaviour
         // or
         // return number * 2;
 
+    }
+
+    // 04
+    private void MultiplyByThree(int number)
+    {
+        Debug.Log(number * 3);
     }
 }

@@ -42,11 +42,11 @@ public class ForLoopAndList : MonoBehaviour
                 myCube.transform.localScale = new Vector3(3, height, 3); // (1, height, 1)
                 myCube.transform.Translate(new Vector3(0, height * 0.5f, 0));
 
-                // 05 assign color
-                float value = Map(i * x + j, 0, x * z, 0, 1);
-                myCube.GetComponent<Renderer>().material.color = Color.HSVToRGB(value, 1, 1);
-
                 // home work: how to make cubes bigger, like real buildings?
+
+                // 05 assign color
+                float value = Map(i * x + j, 0, x * z, 0, 1); 
+                myCube.GetComponent<Renderer>().material.color = Color.HSVToRGB(value, 1, 1);
 
                 // 06
                 myCubes.Add(myCube);
