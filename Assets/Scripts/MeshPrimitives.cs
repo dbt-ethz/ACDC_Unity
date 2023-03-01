@@ -30,14 +30,6 @@ public class MeshPrimitives : MonoBehaviour
         Debug.Log("Inspector causes this Update");
         InitMesh();
 
-        //Debug.Log($"vertices: {molaMesh.VertexCount()}, faces: {molaMesh.FacesCount()}");
-        //foreach (Vector3 v in molaMesh.Vertices)
-        //{
-        //    Debug.Log(v.x + ",  " + v.y + ",  " + v.z);
-        //}
-        //molaMesh = MeshSubdivision.subdivide_mesh_extrude_tapered(molaMesh, 0, 0.5f, false);
-        //molaMesh = UtilsMesh.meshOffset(molaMesh, height, true);
-
         MolaMesh molaMesh = new MolaMesh();
 
         switch (myDropDown)
