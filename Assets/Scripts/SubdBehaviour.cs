@@ -42,11 +42,11 @@ public class SubdBehaviour : MonoBehaviour
     }
     public MolaMesh BehaviourA(MolaMesh molaMesh)
     {
-        return MeshSubdivision.subdivide_mesh_extrude(molaMesh, extrudeHeight);
+        return MeshSubdivision.SubdivideMeshExtrude(molaMesh, extrudeHeight);
     }
     public MolaMesh BehaviourB(MolaMesh molaMesh)
     {
-        return MeshSubdivision.subdivide_mesh_extrude_tapered(molaMesh, extrudeHeight, 0.5f);
+        return MeshSubdivision.SubdivideMeshExtrudeTapered(molaMesh, extrudeHeight, 0.5f);
     }
     private void InitMesh()
     {

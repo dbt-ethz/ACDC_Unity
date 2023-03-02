@@ -58,11 +58,11 @@ public class SubMeshBehaviour : MonoBehaviour
         Color color = Color.white;
         MeshFactory.AddQuad(block, 0, 0, 0, 100, 0, 0, 100, 0, 50, 0, 0, 50, color, true);
 
-        block = MeshSubdivision.subdivide_mesh_grid(block, nU, nV);
+        block = MeshSubdivision.SubdivideMeshGrid(block, nU, nV);
 
         foreach(var face in block.Faces)
         {
-            List<Vector3[]> new_faces_vertices = MeshSubdivision.subdivide_face_extrude_tapered(block, face, 0, 0.2f, true);
+            List<Vector3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(block, face, 0, 0.2f, true);
             for (int i = 0; i < new_faces_vertices.Count - 1; i++)
             {
                 road.AddFace(new_faces_vertices[i]);
@@ -85,7 +85,7 @@ public class SubMeshBehaviour : MonoBehaviour
                 if (Random.value < 0.2) newfloor.AddFace(UtilsVertex.face_vertices(floor, face));
                 else
                 {
-                    List<Vector3[]> new_faces_vertices = MeshSubdivision.subdivide_face_extrude(floor, face, 3, true);
+                    List<Vector3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrude(floor, face, 3, true);
                     for (int j = 0; j < new_faces_vertices.Count - 1; j++)
                     {
                         wall.AddFace(new_faces_vertices[j]);
@@ -96,7 +96,7 @@ public class SubMeshBehaviour : MonoBehaviour
             floor = newfloor;
         }
 
-        wall = MeshSubdivision.subdivide_mesh_grid(wall, 10, 1);
+        wall = MeshSubdivision.SubdivideMeshGrid(wall, 10, 1);
 
         foreach (var face in wall.Faces)
         {
@@ -107,7 +107,7 @@ public class SubMeshBehaviour : MonoBehaviour
 
         foreach (var face in window.Faces)
         {
-            List<Vector3[]> new_faces_vertices = MeshSubdivision.subdivide_face_extrude_tapered(window, face, 0, 0.2f, true);
+            List<Vector3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(window, face, 0, 0.2f, true);
             for (int j = 0; j < new_faces_vertices.Count - 1; j++)
             {
                 frame.AddFace(new_faces_vertices[j]);

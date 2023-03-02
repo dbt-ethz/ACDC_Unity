@@ -12,7 +12,7 @@ public class SubdWithCondition : MonoBehaviour
 
         MolaMesh molaMesh = new MolaMesh(); 
         // create egg 
-        molaMesh = MeshFactory.createSphere(5, 0, 0, 0, 16, 16);
+        molaMesh = MeshFactory.CreateSphere(5, 0, 0, 0, 16, 16);
         for (int i = 0; i < molaMesh.VertexCount(); i++)
         {
             if(molaMesh.Vertices[i].y > 0)
@@ -22,7 +22,7 @@ public class SubdWithCondition : MonoBehaviour
         }
 
         // calculate attribute 1 for
-        List<float> attribute1 = molaMesh.FaceProperties(UtilsFace.face_angle_vertical);
+        List<float> attribute1 = molaMesh.FaceProperties(UtilsFace.FaceAngleVertical);
         for (int i = 0; i < attribute1.Count; i++)
         {
             attribute1[i] = Mathf.Abs(Mathf.PI - Mathf.Abs(attribute1[i]));
@@ -30,7 +30,7 @@ public class SubdWithCondition : MonoBehaviour
         attribute1 = UtilsMath.MapList(attribute1, 0.3f, 1);
 
         // calculate attribute 2 for
-        List<float> attribute2 = molaMesh.FaceProperties(UtilsFace.face_center_y);
+        List<float> attribute2 = molaMesh.FaceProperties(UtilsFace.FaceCenterY);
         attribute2 = UtilsMath.MapList(attribute2, 0.9f, 0.1f);
 
         List<bool> attribute3 = new List<bool>(new bool[molaMesh.FacesCount()]);
@@ -40,12 +40,12 @@ public class SubdWithCondition : MonoBehaviour
             else attribute3[i] = true;
         }
 
-        molaMesh = MeshSubdivision.subdivide_mesh_extrude_tapered(molaMesh, attribute1, attribute2, attribute3);
-        molaMesh = UtilsMesh.meshOffset(molaMesh, 0.1f, true);
+        molaMesh = MeshSubdivision.SubdivideMeshExtrudeTapered(molaMesh, attribute1, attribute2, attribute3);
+        molaMesh = UtilsMesh.MeshOffset(molaMesh, 0.1f, true);
 
-        List<float> attribute4 = molaMesh.FaceProperties(UtilsFace.face_center_y);
+        List<float> attribute4 = molaMesh.FaceProperties(UtilsFace.FaceCenterY);
 
-        UtilsFace.color_face_by_value(molaMesh, attribute4);
+        UtilsFace.ColorFaceByValue(molaMesh, attribute4);
 
         molaMesh.FillUnityMesh(mesh);
 

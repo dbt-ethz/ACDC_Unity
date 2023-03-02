@@ -12,22 +12,27 @@ public enum myEnum
     Torus,
     Tetrahedron,
     Icosahedron,
-    Dodecahedron
+    Dodecahedron,
+    Octahedron,
+    RhombicDodecahedron
 }
 public class MeshPrimitives : MonoBehaviour
 {
     public myEnum myDropDown = new myEnum();
 
     [Range(0, 10)]
-    public float size = 1;
+    public float paraA = 1;
     [Range(0, 10)]
-    public float height;
+    public float paraB = 1;
+    [Range(0, 10)]
+    public float paraC = 1;
+    [Range(0, 1)]
+    public float colorValue = 0;
 
     private Mesh mesh;
 
     private void OnValidate()
     {
-        Debug.Log("Inspector causes this Update");
         InitMesh();
 
         MolaMesh molaMesh = new MolaMesh();
@@ -35,37 +40,42 @@ public class MeshPrimitives : MonoBehaviour
         switch (myDropDown)
         {
             case myEnum.Box:
-                molaMesh = MeshFactory.createBox(0, 0, 0, size, size, size);
+                molaMesh = MeshFactory.CreateBox(0, 0, 0, paraA, paraA, paraA);
                 break;            
             case myEnum.Cone:
-                molaMesh = MeshFactory.createCone(new Vector3(0, 0, 0), new Vector3(0, 0, 1), 6, 0.2f, 1.5f);
+                molaMesh = MeshFactory.CreateCone(0, paraA, paraB, paraC, 6, true, true);
                 break;
             case myEnum.Sphere:
-                molaMesh = MeshFactory.createSphere(size);
+                molaMesh = MeshFactory.CreateSphere(paraA);
                 break;            
             case myEnum.Torus:
-                molaMesh = MeshFactory.createTorus(size, height);
+                molaMesh = MeshFactory.CreateTorus(paraA, paraB);
                 break;            
             case myEnum.Tetrahedron:
-                molaMesh = MeshFactory.createTetrahedron(size, transform.position.x, transform.position.y, transform.position.z);
+                molaMesh = MeshFactory.CreateTetrahedron(paraA, 0, 0, 0);
                 break;
             case myEnum.Dodecahedron:
-                molaMesh = MeshFactory.createDodecahedron(size, transform.position.x, transform.position.y, transform.position.z);
+                molaMesh = MeshFactory.CreateDodecahedron(paraA, 0, 0, 0);
                 break;
             case myEnum.Icosahedron:
-                molaMesh = MeshFactory.createIcosahedron(size, transform.position.x, transform.position.y, transform.position.z);
+                molaMesh = MeshFactory.CreateIcosahedron(paraA, 0, 0, 0);
+                break;
+            case myEnum.Octahedron:
+                molaMesh = MeshFactory.CreateOctahedron(paraA);
+                break;
+            case myEnum.RhombicDodecahedron:
+                molaMesh = MeshFactory.CreateRhombicDodecahedron(paraA);
                 break;
         }
 
-        // molaMesh.SeparateVertices();
+        molaMesh.SeparateVertices();
         molaMesh.FillUnityMesh(mesh);
         //Debug.Log($"unity mesh vertices: {mesh.vertices.Length}, faces: {mesh.triangles.Length}");
-
     }
 
     private void InitMesh()
     {
-        // init mesh filter
+
         MeshFilter meshFilter = GetComponent<MeshFilter>();
         if (null == meshFilter)
         {
@@ -75,14 +85,12 @@ public class MeshPrimitives : MonoBehaviour
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         meshFilter.mesh = mesh;
 
-        // init mesh renderer
         MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
         if (renderer == null)
         {
             renderer = this.gameObject.AddComponent<MeshRenderer>();
         }
-        //renderer.material = new Material(Shader.Find("Particles/Standard Surface"));
         renderer.material = new Material(Shader.Find("Standard"));
-        renderer.sharedMaterial.color = Color.white;
+        renderer.sharedMaterial.color = Color.HSVToRGB(colorValue, 1, 1);
     }
 }
