@@ -48,6 +48,10 @@ public class SubdBehaviour : MonoBehaviour
     {
         return MeshSubdivision.SubdivideMeshExtrudeTapered(molaMesh, extrudeHeight, 0.5f);
     }
+    public MolaMesh BehaviourC(MolaMesh molaMesh)
+    {
+        return MeshSubdivision.SubdivideMeshCatmullClark(molaMesh);
+    }
     private void InitMesh()
     {
         // init mesh filter
@@ -66,6 +70,6 @@ public class SubdBehaviour : MonoBehaviour
         {
             renderer = this.gameObject.AddComponent<MeshRenderer>();
         }
-        renderer.material = new Material(Shader.Find("Particles/Standard Surface"));
+        renderer.material = new Material(Shader.Find("Standard"));
     }
 }

@@ -16,7 +16,7 @@ public enum myEnum
     Octahedron,
     RhombicDodecahedron
 }
-public class MeshPrimitives : MonoBehaviour
+public class MeshPrimitivesAndSubd : MonoBehaviour
 {
     public myEnum myDropDown = new myEnum();
 
@@ -28,6 +28,11 @@ public class MeshPrimitives : MonoBehaviour
     public float paraC = 1;
     [Range(0, 1)]
     public float colorValue = 0;
+    [Range(0, 5)]
+    public int subdInteration = 1;
+    [Range(0, 10)]
+    public float subdLength = 0;
+
 
     private Mesh mesh;
 
@@ -37,6 +42,7 @@ public class MeshPrimitives : MonoBehaviour
 
         MolaMesh molaMesh = new MolaMesh();
 
+        // create mola mesh primitive from the selection of dropdown menu
         switch (myDropDown)
         {
             case myEnum.Box:
@@ -68,9 +74,14 @@ public class MeshPrimitives : MonoBehaviour
                 break;
         }
 
-        molaMesh.SeparateVertices();
+        // apply mesh subdivision
+        for (int i = 0; i < subdInteration; i++)
+        {
+            molaMesh = MeshSubdivision.SubdivideMeshExtrude(molaMesh, subdLength);
+        }
+        
+        //molaMesh.SeparateVertices();
         molaMesh.FillUnityMesh(mesh);
-        //Debug.Log($"unity mesh vertices: {mesh.vertices.Length}, faces: {mesh.triangles.Length}");
     }
 
     private void InitMesh()
