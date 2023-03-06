@@ -9,7 +9,7 @@ public class SimpleMolaPrimitiveExample : MonoBehaviour
     public float length;
     private Mesh mesh;
 
-    private void OnValidate()
+    private void OnValidate() //{ UnityEditor.EditorApplication.update += _OnValidate; }
     {
         Debug.Log("Inspector causes this Update");
         // 01 create unity object
