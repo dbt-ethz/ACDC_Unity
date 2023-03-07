@@ -14,60 +14,60 @@ public class ForLoopAndList : MonoBehaviour
     public float distance;
 
     // 06 list
-    private List<GameObject> myCubes = new List<GameObject>();
-    private void Start()
+    private List<GameObject> myCubes;
+    private void OnValidate() 
+    { 
+        UnityEditor.EditorApplication.delayCall += UpdateGeometry; 
+    }
+ 
+    private void UpdateGeometry()
     {
-        // 01 for loop
-        for (int i = 0; i < 100; i++)
+        int n = transform.childCount;
+        for (int i = 0; i < n; i++)
         {
-            Debug.Log(i);
+            DestroyImmediate(transform.GetChild(0).gameObject);
         }
 
-        // 02 
+        myCubes = new List<GameObject>();
+
         for (int i = 0; i < x; i++)
         {
             for (int j = 0; j < z; j++)
             {
                 //02 nested for loop
-                Debug.Log(i * x + j);
+                //Debug.Log(i * z + j);
 
                 // 03 create box for each iteration
                 GameObject myCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 myCube.transform.SetParent(this.transform);
                 // 03.5 extension: vector and vector math
-                myCube.transform.localPosition = new Vector3(i * distance, 0, j * distance);
-
+                
                 // 04 assign random height to cubes
                 float height = Random.Range(3, 20); // (3, 10)
                 myCube.transform.localScale = new Vector3(3, height, 3); // (1, height, 1)
-                myCube.transform.Translate(new Vector3(0, height * 0.5f, 0));
+                myCube.transform.localPosition = new Vector3(i * distance, height * 0.5f, j * distance);
 
-                // home work: how to make cubes bigger, like real buildings?
 
                 // 05 assign color
-                float value = Map(i * x + j, 0, x * z, 0, 1); 
-                myCube.GetComponent<Renderer>().material.color = Color.HSVToRGB(value, 1, 1);
+                float value = UtilsMath.Remap(i * z + j, 0, x * z, 0, 1);
+
+                Renderer renderer = myCube.GetComponent<Renderer>();
+                Material tempMats = new Material(renderer.sharedMaterial);
+                tempMats.color = Color.HSVToRGB(value, 1, 1);
+                renderer.material = tempMats;
 
                 // 06
                 myCubes.Add(myCube);
             }
         }
 
-        // 06
-        Debug.Log(myCubes.Count);
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < (int)(x * z * 0.3); i++)
         {
             int index = Random.Range(0, myCubes.Count);
-            Destroy(myCubes[index]);
+            DestroyImmediate(myCubes[index]);
             myCubes.RemoveAt(index);
         }
     }
 
-    // 05 assign color
-    private float Map(float value, float fromMin, float fromMax, float toMin, float toMax)
-    {
-        float delta = fromMax - fromMin;
-        return toMin + ((toMax - toMin) / delta) * (value - fromMin);
-    }
 
 }
