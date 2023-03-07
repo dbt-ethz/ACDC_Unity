@@ -2,72 +2,70 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//[ExecuteInEditMode]
 public class ForLoopAndList : MonoBehaviour
 {
-    // 02
     [Range (0, 20)]
     public int x;
     [Range(0, 20)]
     public int z;
     [Range(0, 20)]
     public float distance;
-
-    // 06 list
     private List<GameObject> myCubes;
-    private void OnValidate() 
-    { 
-        UnityEditor.EditorApplication.delayCall += UpdateGeometry; 
-    }
- 
+    
     private void UpdateGeometry()
     {
+        // delete cubes from previous run
         int n = transform.childCount;
         for (int i = 0; i < n; i++)
         {
             DestroyImmediate(transform.GetChild(0).gameObject);
         }
 
+        // empty list before generating new cubes
         myCubes = new List<GameObject>();
 
+        // nested for loop
         for (int i = 0; i < x; i++)
         {
             for (int j = 0; j < z; j++)
             {
-                //02 nested for loop
                 //Debug.Log(i * z + j);
 
-                // 03 create box for each iteration
+                // create box for each iteration
                 GameObject myCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 myCube.transform.SetParent(this.transform);
-                // 03.5 extension: vector and vector math
-                
-                // 04 assign random height to cubes
-                float height = Random.Range(3, 20); // (3, 10)
-                myCube.transform.localScale = new Vector3(3, height, 3); // (1, height, 1)
+
+                // assign random height to cubes, relocate them to designed position
+                float height = Random.Range(3, 20); 
+                myCube.transform.localScale = new Vector3(3, height, 3); 
                 myCube.transform.localPosition = new Vector3(i * distance, height * 0.5f, j * distance);
 
-
-                // 05 assign color
+                // assign color using unity built in map function
                 float value = UtilsMath.Remap(i * z + j, 0, x * z, 0, 1);
 
+                // create temp material so the default material will not be overwirte. this part is not important for now
                 Renderer renderer = myCube.GetComponent<Renderer>();
                 Material tempMats = new Material(renderer.sharedMaterial);
                 tempMats.color = Color.HSVToRGB(value, 1, 1);
                 renderer.material = tempMats;
 
-                // 06
+                // add cube to list
                 myCubes.Add(myCube);
             }
         }
 
-        for (int i = 0; i < (int)(x * z * 0.3); i++)
+        // randomly reduce 30% of cubes
+        for (int i = 0; i < x * z * 0.3; i++)
         {
             int index = Random.Range(0, myCubes.Count);
             DestroyImmediate(myCubes[index]);
             myCubes.RemoveAt(index);
         }
     }
-
+    // This part is required for unity. Don’t change it (It allows the script to run on inspector window change.)
+    private void OnValidate()
+    {
+        UnityEditor.EditorApplication.delayCall += UpdateGeometry;
+    }
 
 }
