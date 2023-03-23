@@ -3,71 +3,98 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mola;
 
+[ExecuteInEditMode]
 public class SubdWithCondition : MonoBehaviour
 {
-    private Mesh mesh;
+    [Range(0, 5)]
+    public float extrudeHeightMin = 0;
+    [Range(0, 5)]
+    public float extrudeHeightMax = 1;
+    [Range(0, 2)]
+    public float fractiontMin = 0.1f;
+    [Range(0, 2)]
+    public float fractionMax = 0.9f;
+    [Range(0, 1)]
+    public float offsetDepth = 0.1f;
+    private Mesh unityMesh;
+    private void Start()
+    {
+        unityMesh = InitMesh();
+        UpdateGeometry();
+    }
     private void OnValidate()
     {
-        InitMesh();
-
+        UpdateGeometry();
+    }
+    private void UpdateGeometry()
+    {
         MolaMesh molaMesh = new MolaMesh(); 
         // create egg 
         molaMesh = MeshFactory.CreateSphere(5, 0, 0, 0, 16, 16);
-        for (int i = 0; i < molaMesh.VertexCount(); i++)
+
+        // get attribute 4 for color
+        List<float> attribute = molaMesh.FaceProperties(UtilsFace.FaceCenterY);
+
+        UtilsFace.ColorFaceByValue(molaMesh, attribute);
+
+        // convert mola mesh to unity mesh
+        if (unityMesh != null)
         {
-            if(molaMesh.Vertices[i].y > 0)
-            {
-                molaMesh.Vertices[i] += new Vector3(0, molaMesh.Vertices[i].y * 0.8f, 0);
-            }
+            HDMeshToUnity.FillUnityMesh(unityMesh, molaMesh);
         }
 
-        // calculate attribute 1 for
-        List<float> attribute1 = molaMesh.FaceProperties(UtilsFace.FaceAngleVertical);
-        for (int i = 0; i < attribute1.Count; i++)
-        {
-            attribute1[i] = Mathf.Abs(Mathf.PI - Mathf.Abs(attribute1[i]));
-        }
-        attribute1 = UtilsMath.MapList(attribute1, 0.3f, 1);
+        //for (int i = 0; i < molaMesh.VertexCount(); i++)
+        //{
+        //    if(molaMesh.Vertices[i].y > 0)
+        //    {
+        //        molaMesh.Vertices[i] += new Vector3(0, molaMesh.Vertices[i].y * 0.8f, 0);
+        //    }
+        //}
 
-        // calculate attribute 2 for
-        List<float> attribute2 = molaMesh.FaceProperties(UtilsFace.FaceCenterY);
-        attribute2 = UtilsMath.MapList(attribute2, 0.9f, 0.1f);
 
-        List<bool> attribute3 = new List<bool>(new bool[molaMesh.FacesCount()]);
-        for (int i = 0; i < attribute3.Count; i++)
-        {
-            if (attribute2[i] > 0.2) attribute3[i] = false;
-            else attribute3[i] = true;
-        }
 
-        molaMesh = MeshSubdivision.SubdivideMeshExtrudeTapered(molaMesh, attribute1, attribute2, attribute3);
-        molaMesh = UtilsMesh.MeshOffset(molaMesh, 0.1f, true);
+        //// get attribute 1 for extruding height
+        //List<float> attribute1 = molaMesh.FaceProperties(UtilsFace.FaceAngleVertical);
+        //for (int i = 0; i < attribute1.Count; i++)
+        //{
+        //    attribute1[i] = Mathf.Abs(Mathf.PI - Mathf.Abs(attribute1[i]));
+        //}
+        //attribute1 = UtilsMath.MapList(attribute1, extrudeHeightMin, extrudeHeightMax);
 
-        List<float> attribute4 = molaMesh.FaceProperties(UtilsFace.FaceCenterY);
+        //// get attribute 2 for fraction
+        //List<float> attribute2 = molaMesh.FaceProperties(UtilsFace.FaceCenterY);
+        //attribute2 = UtilsMath.MapList(attribute2, fractionMax, fractiontMin);
 
-        UtilsFace.ColorFaceByValue(molaMesh, attribute4);
+        //// get attribute 3 for capTop
+        //List<bool> attribute3 = new List<bool>(new bool[molaMesh.FacesCount()]);
+        //for (int i = 0; i < attribute3.Count; i++)
+        //{
+        //    if (attribute2[i] > 0.2) attribute3[i] = false;
+        //    else attribute3[i] = true;
+        //}
 
-        molaMesh.FillUnityMesh(mesh);
+        //molaMesh = MeshSubdivision.SubdivideMeshExtrudeTapered(molaMesh, attribute1, attribute2, attribute3);
+        molaMesh = UtilsMesh.MeshOffset(molaMesh, offsetDepth, true);
 
     }
-    private void InitMesh()
+    private Mesh InitMesh()
     {
-        // init mesh filter
+        Mesh mesh = new Mesh();
+        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         MeshFilter meshFilter = GetComponent<MeshFilter>();
-        if (null == meshFilter)
+        if (meshFilter == null)
         {
             meshFilter = this.gameObject.AddComponent<MeshFilter>();
         }
-        mesh = new Mesh();
-        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         meshFilter.mesh = mesh;
 
-        // init mesh renderer
-        MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
-        if (renderer == null)
+        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        if (meshRenderer == null)
         {
-            renderer = this.gameObject.AddComponent<MeshRenderer>();
+            meshRenderer = this.gameObject.AddComponent<MeshRenderer>();
         }
-        renderer.material = new Material(Shader.Find("Particles/Standard Surface"));
+        meshRenderer.material = new Material(Shader.Find("Particles/Standard Surface"));
+
+        return mesh;
     }
 }

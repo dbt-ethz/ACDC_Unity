@@ -4,6 +4,8 @@ using UnityEngine;
 using Mola;
 using System;
 using Random = UnityEngine.Random;
+using Mathf = Mola.Mathf;
+using Color = Mola.Color;
 
 [ExecuteInEditMode]
 public class VoxelBehaviour : MonoBehaviour
@@ -30,7 +32,7 @@ public class VoxelBehaviour : MonoBehaviour
         SphereGrid(new Vector3(20, 20, 20), radius);
         MolaMesh molaMesh = UtilsGrid.VoxelMesh(grid, Color.red);
         Debug.Log($"quad count: {molaMesh.FacesCount()}");
-        molaMesh.FillUnityMesh(mesh);
+        HDMeshToUnity.FillUnityMesh(mesh, molaMesh);
     }
 
     private void InitGrid()

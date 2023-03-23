@@ -12,7 +12,7 @@ public class SimpleForLoop : MonoBehaviour
     // this function will run everytime anything changes in inspector window. 
     private void UpdateGeometry()
     {
-        // delete cubes from previous run
+        // delete all cubes from previous run
         int n = transform.childCount;
         for (int i = 0; i < n; i++)
         {
@@ -34,6 +34,9 @@ public class SimpleForLoop : MonoBehaviour
     // This part is required for unity. Don’t change it (It allows the script to run on inspector window change.)
     private void OnValidate()
     {
-        UnityEditor.EditorApplication.delayCall += UpdateGeometry;
+        Debug.Log("inspector change");
+#if UNITY_EDITOR
+        //UnityEditor.EditorApplication.delayCall += UpdateGeometry;
+#endif
     }
 }

@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mola;
-using System.Reflection;
+using Color = UnityEngine.Color;
 
+// enum is a customized data type
 public enum myEnum
 {
     Box,
@@ -16,6 +17,7 @@ public enum myEnum
     Octahedron,
     RhombicDodecahedron
 }
+[ExecuteInEditMode]
 public class MeshPrimitivesAndSubd : MonoBehaviour
 {
     public myEnum myDropDown = new myEnum();
@@ -33,75 +35,105 @@ public class MeshPrimitivesAndSubd : MonoBehaviour
     [Range(0, 10)]
     public float subdLength = 0;
 
+    private Mesh unityMesh;
+    private MolaMesh molaMesh;
 
-    private Mesh mesh;
-
+    private void Start()
+    {
+        unityMesh = InitMesh();
+        UpdateGeometry();
+    }
     private void OnValidate()
     {
-        InitMesh();
+        UpdateGeometry();
+    }
+    private void UpdateGeometry()
+    {
+        // create mola mesh primitive
+        molaMesh = createPrimitive();
 
-        MolaMesh molaMesh = new MolaMesh();
+        // apply subdivision methods
+        molaMesh = ApplySubdivision(molaMesh);
 
+        //// update unity mesh color
+        //MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        //if(meshRenderer != null)
+        //{
+        //    meshRenderer.sharedMaterial.color = Color.HSVToRGB(colorValue, 1, 1);
+        //}
+
+        // convert mola mesh to unity mesh
+        if (unityMesh != null)
+        {
+            HDMeshToUnity.FillUnityMesh(unityMesh, molaMesh);
+        }
+    }
+    private MolaMesh createPrimitive()
+    {
+        MolaMesh mesh = new MolaMesh();
         // create mola mesh primitive from the selection of dropdown menu
         switch (myDropDown)
         {
             case myEnum.Box:
-                molaMesh = MeshFactory.CreateBox(0, 0, 0, paraA, paraA, paraA);
-                break;            
+                mesh = MeshFactory.CreateBox(0, 0, 0, paraA, paraA, paraA);
+                break;
             case myEnum.Cone:
-                molaMesh = MeshFactory.CreateCone(0, paraA, paraB, paraC, 6, true, true);
+                mesh = MeshFactory.CreateCone(0, paraA, paraB, paraC, 6, true, true);
                 break;
             case myEnum.Sphere:
-                molaMesh = MeshFactory.CreateSphere(paraA);
-                break;            
+                mesh = MeshFactory.CreateSphere(paraA);
+                break;
             case myEnum.Torus:
-                molaMesh = MeshFactory.CreateTorus(paraA, paraB);
-                break;            
+                mesh = MeshFactory.CreateTorus(paraA, paraB);
+                break;
             case myEnum.Tetrahedron:
-                molaMesh = MeshFactory.CreateTetrahedron(paraA, 0, 0, 0);
+                mesh = MeshFactory.CreateTetrahedron(paraA, 0, 0, 0);
                 break;
             case myEnum.Dodecahedron:
-                molaMesh = MeshFactory.CreateDodecahedron(paraA, 0, 0, 0);
+                mesh = MeshFactory.CreateDodecahedron(paraA, 0, 0, 0);
                 break;
             case myEnum.Icosahedron:
-                molaMesh = MeshFactory.CreateIcosahedron(paraA, 0, 0, 0);
+                mesh = MeshFactory.CreateIcosahedron(paraA, 0, 0, 0);
                 break;
             case myEnum.Octahedron:
-                molaMesh = MeshFactory.CreateOctahedron(paraA);
+                mesh = MeshFactory.CreateOctahedron(paraA);
                 break;
             case myEnum.RhombicDodecahedron:
-                molaMesh = MeshFactory.CreateRhombicDodecahedron(paraA);
-                break;
+                mesh = MeshFactory.CreateRhombicDodecahedron(paraA);
+                break; 
         }
-
-        // apply mesh subdivision
-        for (int i = 0; i < subdInteration; i++)
-        {
-            molaMesh = MeshSubdivision.SubdivideMeshExtrude(molaMesh, subdLength);
-        }
-        
-        //molaMesh.SeparateVertices();
-        molaMesh.FillUnityMesh(mesh);
+        return mesh;
     }
-
-    private void InitMesh()
+    private MolaMesh ApplySubdivision(MolaMesh molaMesh)
     {
+        molaMesh = MeshSubdivision.SubdivideMeshExtrude(molaMesh, subdLength);
 
+        //for (int i = 0; i < subdInteration; i++)
+        //{
+        //    molaMesh = MeshSubdivision.SubdivideMeshExtrude(molaMesh, subdLength);
+        //}
+        molaMesh = MeshSubdivision.SubdivideMeshExtrudeToPointCenter(molaMesh, paraC);
+        return molaMesh;
+    }
+    // This part is to prepare unity mesh. Don’t change it
+    private Mesh InitMesh()
+    {
+        Mesh mesh = new Mesh();
+        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         MeshFilter meshFilter = GetComponent<MeshFilter>();
-        if (null == meshFilter)
+        if (meshFilter == null)
         {
             meshFilter = this.gameObject.AddComponent<MeshFilter>();
         }
-        mesh = new Mesh();
-        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         meshFilter.mesh = mesh;
 
-        MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
-        if (renderer == null)
+        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        if (meshRenderer == null)
         {
-            renderer = this.gameObject.AddComponent<MeshRenderer>();
+            meshRenderer = this.gameObject.AddComponent<MeshRenderer>();
         }
-        renderer.material = new Material(Shader.Find("Standard"));
-        renderer.sharedMaterial.color = Color.HSVToRGB(colorValue, 1, 1);
+        meshRenderer.material = new Material(Shader.Find("Standard"));
+        meshRenderer.sharedMaterial.color = Color.HSVToRGB(colorValue, 1, 1);
+        return mesh;
     }
 }

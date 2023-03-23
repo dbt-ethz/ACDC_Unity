@@ -38,7 +38,7 @@ public class CatmullClark : MonoBehaviour
             //molaMesh.WeldVertices();
         }
 
-        molaMesh.FillUnityMesh(mesh);
+        HDMeshToUnity.FillUnityMesh(mesh, molaMesh);
     }
     private void InitMesh()
     {

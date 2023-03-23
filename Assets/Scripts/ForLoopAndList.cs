@@ -11,11 +11,12 @@ public class ForLoopAndList : MonoBehaviour
     [Range(0, 20)]
     public float distance;
     private List<GameObject> myCubes;
-    
+
     private void UpdateGeometry()
     {
         // delete cubes from previous run
         int n = transform.childCount;
+
         for (int i = 0; i < n; i++)
         {
             DestroyImmediate(transform.GetChild(0).gameObject);
@@ -41,7 +42,7 @@ public class ForLoopAndList : MonoBehaviour
                 myCube.transform.localPosition = new Vector3(i * distance, height * 0.5f, j * distance);
 
                 // assign color using unity built in map function
-                float value = UtilsMath.Remap(i * z + j, 0, x * z, 0, 1);
+                float value = Remap(i * z + j, 0, x * z, 0, 1);
 
                 // create temp material so the default material will not be overwirte. this part is not important for now
                 Renderer renderer = myCube.GetComponent<Renderer>();
@@ -62,10 +63,17 @@ public class ForLoopAndList : MonoBehaviour
             myCubes.RemoveAt(index);
         }
     }
+    public static float Remap(float value, float input1, float input2, float output1, float output2)
+    {
+        return (output2 - output1) * value / (input2 - input1) + output1;
+    }
+
     // This part is required for unity. Don’t change it (It allows the script to run on inspector window change.)
     private void OnValidate()
     {
+#if UNITY_EDITOR
         UnityEditor.EditorApplication.delayCall += UpdateGeometry;
+#endif
     }
 
 }

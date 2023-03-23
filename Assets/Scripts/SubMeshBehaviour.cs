@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mola;
+using Color = Mola.Color;
 
 [ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
@@ -16,27 +17,32 @@ public class SubMeshBehaviour : MonoBehaviour
     [Range(0, 1)]
     public float windowRatio = 0.5f;
 
-    private Mesh mesh;
+    private Mesh unityMesh;
 
     private void Start()
     {
-        Debug.Log("start is called");
-        InitMesh();
+        unityMesh = InitMesh();
+        UpdateGeometry();
     }
-
     private void OnValidate()
     {
+        UpdateGeometry();
+    }
+    private void UpdateGeometry()
+    {
         List<MolaMesh> molaMeshes = ExecuteSubd();
-        MolaMesh.FillUnitySubMeshes(mesh, molaMeshes);
-
-        Debug.Log($"unity mesh triangle counts: {mesh.triangles.Length}");
-
+        if (unityMesh != null)
+        {
+            HDMeshToUnity.FillUnitySubMeshes(unityMesh, molaMeshes);
+            Debug.Log($"unity mesh triangle counts: {unityMesh.triangles.Length}");
+        }
+        
         // assign materials
         Material[] mats = new Material[molaMeshes.Count];
         for (int i = 0; i < mats.Length; i++)
         {
             mats[i] = new Material(Shader.Find("Standard"));
-            mats[i].color = UtilsMath.RandomColor();
+            mats[i].color = RandomColor();
         }
         MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
         renderer.materials = mats;
@@ -62,7 +68,7 @@ public class SubMeshBehaviour : MonoBehaviour
 
         foreach(var face in block.Faces)
         {
-            List<Vector3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(block, face, 0, 0.2f, true);
+            List<Vec3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(block, face, 0, 0.2f, true);
             for (int i = 0; i < new_faces_vertices.Count - 1; i++)
             {
                 road.AddFace(new_faces_vertices[i]);
@@ -72,7 +78,7 @@ public class SubMeshBehaviour : MonoBehaviour
 
         foreach(var face in plot.Faces)
         {
-            Vector3[] face_vertices = UtilsVertex.face_vertices(plot, face);
+            Vec3[] face_vertices = UtilsVertex.face_vertices(plot, face);
             if (Random.value < 0.3) garden.AddFace(face_vertices);
             else floor.AddFace(face_vertices);
         }
@@ -85,7 +91,7 @@ public class SubMeshBehaviour : MonoBehaviour
                 if (Random.value < 0.2) newfloor.AddFace(UtilsVertex.face_vertices(floor, face));
                 else
                 {
-                    List<Vector3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrude(floor, face, 3, true);
+                    List<Vec3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrude(floor, face, 3, true);
                     for (int j = 0; j < new_faces_vertices.Count - 1; j++)
                     {
                         wall.AddFace(new_faces_vertices[j]);
@@ -100,14 +106,14 @@ public class SubMeshBehaviour : MonoBehaviour
 
         foreach (var face in wall.Faces)
         {
-            Vector3[] face_vertices = UtilsVertex.face_vertices(wall, face);
+            Vec3[] face_vertices = UtilsVertex.face_vertices(wall, face);
             if (Random.value > windowRatio) panel.AddFace(face_vertices);
             else window.AddFace(face_vertices);
         }
 
         foreach (var face in window.Faces)
         {
-            List<Vector3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(window, face, 0, 0.2f, true);
+            List<Vec3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(window, face, 0, 0.2f, true);
             for (int j = 0; j < new_faces_vertices.Count - 1; j++)
             {
                 frame.AddFace(new_faces_vertices[j]);
@@ -118,6 +124,11 @@ public class SubMeshBehaviour : MonoBehaviour
         List<MolaMesh> molaMeshes = new List<MolaMesh>() {road, garden, floor, panel, glass, frame};
         return molaMeshes;
     }
+    public static UnityEngine.Color RandomColor()
+    {
+        return new UnityEngine.Color(Random.value, Random.value, Random.value);
+    }
+
     public MolaMesh InitMolaMesh()
     {
         MolaMesh newMesh = new MolaMesh();
@@ -129,16 +140,24 @@ public class SubMeshBehaviour : MonoBehaviour
         return newMesh;
     }
 
-    private void InitMesh()
+    private Mesh InitMesh()
     {
-        // init mesh filter
+        Mesh mesh = new Mesh();
+        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         MeshFilter meshFilter = GetComponent<MeshFilter>();
-        if (null == meshFilter)
+        if (meshFilter == null)
         {
             meshFilter = this.gameObject.AddComponent<MeshFilter>();
         }
-        mesh = new Mesh();
-        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         meshFilter.mesh = mesh;
+
+        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        if (meshRenderer == null)
+        {
+            meshRenderer = this.gameObject.AddComponent<MeshRenderer>();
+        }
+        meshRenderer.material = new Material(Shader.Find("Particles/Standard Surface"));
+
+        return mesh;
     }
 }

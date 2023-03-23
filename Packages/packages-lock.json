@@ -7,8 +7,14 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.dbt.hdmolaunity": {
+      "version": "file:C:/D/GitHub/HDMolaUnity",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.dbt.mola": {
-      "version": "file:C:/D/GitHub/HDUnity",
+      "version": "file:C:/D/GitHub/HDMola",
       "depth": 0,
       "source": "local",
       "dependencies": {}

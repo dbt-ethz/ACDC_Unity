@@ -3,35 +3,116 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mola;
 
+[ExecuteInEditMode]
 public class SimpleMolaPrimitiveExample : MonoBehaviour
 {
     [Range(0, 10)]
     public float length;
-    private Mesh mesh;
+    [Range(0, 10)]
+    public float height;
+    [Range(0, 5)]
+    public int iteration;
+    [Range(0, 100)]
+    public int gridNum;
+    [Range(3, 100)]
+    public int segments = 4;
+    private Mesh unityMesh;
+    private MolaMesh molaMesh;
 
-    private void OnValidate() //{ UnityEditor.EditorApplication.update += _OnValidate; }
+    private void Start()
     {
-        Debug.Log("Inspector causes this Update");
-        // 01 create unity object
-        // GameObject myMesh = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        // create unity mesh, add mesh filter, mesh renderer
+        unityMesh = InitMesh();
+        UpdateGeometry();
+    }
+    private void OnValidate()
+    {
+        UpdateGeometry();
+    }
+    private void UpdateGeometry()
+    {
+        // create mola mesh
+        //molaMesh = MeshFactory.CreateBox(0, 0, 0, length, length, length);
+        molaMesh = MeshFactory.CreateCone(0, 3, 2, 1, segments, true, false);
+        //molaMesh = UtilsMesh.MeshOffset(molaMesh, 0.5f);
+        //molaMesh.SeparateVertices();
+        //molaMesh.WeldVertices();
+        //MolaMesh molaMesh2 = MeshFactory.CreateBox(3, 3, 3, length * 0.8f, length * 0.8f, length * 0.8f);
+        //molaMesh.AddMesh(molaMesh2);
+        //molaMesh = MeshSubdivision.SubdivideMeshSplitRoof(molaMesh, -0.5f);
 
-        MolaMesh molaMesh = new MolaMesh();
-        //molaMesh = MeshFactory.createBox(0, 0, 0, 1, 1, 1);
+        molaMesh = MeshSubdivision.SubdivideMeshExtrudeTapered(molaMesh, height, 0.7f, true);
+        molaMesh.WeldVertices();
+        for (int i = 0; i < 3; i++)
+        {
+            molaMesh.UpdateTopology();
+            molaMesh = MeshSubdivision.SubdivideMeshCatmullClark(molaMesh);
+        }
+        
+        //molaMesh = MeshSubdivision.SubdivideMeshGrid(molaMesh, gridNum, gridNum);
+        //molaMesh = MeshSubdivision.SubdivideMeshExtrudeTapered(molaMesh, 0, 0.2f, false);
+        //molaMesh = UtilsMesh.MeshOffset(molaMesh, 0.1f);
+        //molaMesh = MeshSubdivision.SubdivideMeshCatmullClark(molaMesh);
 
-        molaMesh = MeshFactory.CreateBox(0, 0, 0, length, length, length);
+        //molaMesh = MeshSubdivision.SubdivideMeshGrid(molaMesh, gridNum, gridNum);
+        //molaMesh = MeshSubdivision.SubdivideMeshExtrude(molaMesh, height);
 
-        InitMesh();
 
-        molaMesh.FillUnityMesh(mesh);
+
+        //molaMesh = MeshSubdivision.SubdivideMeshCatmullClark(molaMesh);
+
+        //molaMesh = MeshSubdivision.SubdivideMeshCatmullClark(molaMesh);
+        //molaMesh = MeshSubdivision.SubdivideMeshCatmullClark(molaMesh);
+        //molaMesh = MeshSubdivision.SubdivideMeshExtrudeToPointCenter(molaMesh, height);
+        //for (int i = 0; i < iteration; i++)
+        //{
+        //    molaMesh = MeshSubdivision.SubdivideMeshCatmullClark(molaMesh);
+        //}
+        //molaMesh = MeshSubdivision.SubdivideMeshCatmullClark(molaMesh);
+        //for (int i = 0; i < iteration; i++)
+        //{
+        //    //molaMesh = MeshSubdivision.SubdivideMeshExtrudeTapered(molaMesh, 2, 0.5f, true);
+        //    //molaMesh = MeshSubdivision.SubdivideMeshExtrude(molaMesh, 3);
+        //    //molaMesh = MeshSubdivision.SubdivideMeshSplitRoof(molaMesh, -0.5f);
+        //    //molaMesh = MeshSubdivision.SubdivideMeshExtrudeToPointCenter(molaMesh, height);
+
+
+        //}
+
+
+        //List<float> attribute = molaMesh.FaceProperties(UtilsFace.FaceCenterY);
+        //List<float> attribute2 = molaMesh.FaceProperties(UtilsFace.FaceAngleVertical);
+
+        //molaMesh.SeparateVertices();
+        //UtilsFace.ColorFaceByValue(molaMesh, attribute);
+        
+        // convert mola mesh to unity mesh
+        if (unityMesh != null)
+        {
+            Debug.Log("face county: " + molaMesh.FacesCount());
+            HDMeshToUnity.FillUnityMesh(unityMesh, molaMesh);
+        }
     }
 
-    private void InitMesh()
+    private Mesh InitMesh()
     {
+        Mesh mesh = new Mesh();
+        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         MeshFilter meshFilter = GetComponent<MeshFilter>();
-        mesh = new Mesh();
+        if (meshFilter == null)
+        {
+            meshFilter = this.gameObject.AddComponent<MeshFilter>();
+        }
         meshFilter.mesh = mesh;
 
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        if (meshRenderer == null)
+        {
+            meshRenderer = this.gameObject.AddComponent<MeshRenderer>();
+        }
+        //meshRenderer.material = new Material(Shader.Find("Particles/Standard Surface"));
         meshRenderer.material = new Material(Shader.Find("Standard"));
+        return mesh;
     }
+
 }

@@ -6,8 +6,8 @@ public class VariablesAndFunctions : MonoBehaviour
 {
     // 02
     int myInt = 5;
-    bool myBool = true;
-    string myString = "hello world!";
+    //bool myBool = true;
+    //string myString = "hello world!";
 
     //06 public int myInt;
 

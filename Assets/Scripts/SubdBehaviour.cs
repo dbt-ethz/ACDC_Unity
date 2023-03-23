@@ -4,6 +4,7 @@ using UnityEngine;
 using Mola;
 using System.Reflection;
 using System;
+using Color = Mola.Color;
 
 //[ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
@@ -15,7 +16,7 @@ public class SubdBehaviour : MonoBehaviour
     public int iteration = 2;
     private Mesh mesh;
 
-    private void OnValidate()
+    private void UpdateGeometry()
     {
         Debug.Log("Inspector causes this Update");
         InitMesh();
@@ -30,7 +31,7 @@ public class SubdBehaviour : MonoBehaviour
         }
 
         Debug.Log($"face count: {molaMesh.FacesCount()}");
-        molaMesh.FillUnityMesh(mesh);
+        HDMeshToUnity.FillUnityMesh(mesh, molaMesh);
     }
     public MolaMesh InitMolaMesh()
     {
@@ -71,5 +72,12 @@ public class SubdBehaviour : MonoBehaviour
             renderer = this.gameObject.AddComponent<MeshRenderer>();
         }
         renderer.material = new Material(Shader.Find("Standard"));
+    }
+    // This part is required for unity. Don’t change it (It allows the script to run on inspector window change.)
+    private void OnValidate()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.delayCall += UpdateGeometry;
+#endif
     }
 }
