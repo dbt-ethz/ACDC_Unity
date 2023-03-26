@@ -66,12 +66,13 @@ public class SubMeshBehaviour : MonoBehaviour
 
         block = MeshSubdivision.SubdivideMeshGrid(block, nU, nV);
 
-        foreach(var face in block.Faces)
+        for (int i = 0; i < block.FacesCount(); i++)
         {
-            List<Vec3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(block, face, 0, 0.2f, true);
-            for (int i = 0; i < new_faces_vertices.Count - 1; i++)
+            Vec3[] face_vertices = block.FaceVertices(i);
+            List<Vec3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(face_vertices, 0, 0.2f, true);
+            for (int j = 0; j < new_faces_vertices.Count - 1; j++)
             {
-                road.AddFace(new_faces_vertices[i]);
+                road.AddFace(new_faces_vertices[j]);
             }
             plot.AddFace(new_faces_vertices[^1]);
         }
@@ -82,6 +83,10 @@ public class SubMeshBehaviour : MonoBehaviour
             if (Random.value < 0.3) garden.AddFace(face_vertices);
             else floor.AddFace(face_vertices);
         }
+        // select by orientation / normal
+        // show weld vertices, updatedtopology, catmullclark.
+        // one heigh rise building
+        // one house with roof
 
         for (int i = 0; i < floors; i++)
         {
@@ -127,17 +132,6 @@ public class SubMeshBehaviour : MonoBehaviour
     public static UnityEngine.Color RandomColor()
     {
         return new UnityEngine.Color(Random.value, Random.value, Random.value);
-    }
-
-    public MolaMesh InitMolaMesh()
-    {
-        MolaMesh newMesh = new MolaMesh();
-        Color color = Color.white;
-        //MeshFactory.AddBox(newMesh, 0, 0, 0, 1, 1, 1, color);
-        MeshFactory.AddQuad(newMesh, 0, 0, 0, 100, 0, 0, 100, 0, 50, 0, 0, 50, color, true);
-        //MeshFactory.AddTriangle(newMesh, 0, 0, 0, 1, 0, 0, 0, 1, 0, color);
-
-        return newMesh;
     }
 
     private Mesh InitMesh()

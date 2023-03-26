@@ -5,8 +5,10 @@ using Mola;
 using Mathf = Mola.Mathf;
 
 [ExecuteInEditMode]
-public class SubdWithCondition : MonoBehaviour
+public class SubdWithConditionII : MonoBehaviour
 {
+    [Range(1, 10)]
+    public float size = 5;
     [Range(0, 5)]
     public float extrudeHeightMin = 0;
     [Range(0, 5)]
@@ -30,38 +32,32 @@ public class SubdWithCondition : MonoBehaviour
     private void UpdateGeometry()
     {
         MolaMesh molaMesh = new MolaMesh(); 
-        // create egg 
-        molaMesh = MeshFactory.CreateSphere(5, 0, 0, 0, 16, 16);
-        for (int i = 0; i < molaMesh.VertexCount(); i++)
+        molaMesh = MeshFactory.CreateSphere(size, 0, 0, 0, 16, 16);
+
+        MolaMesh newMesh = new MolaMesh();
+        foreach (var face in molaMesh.Faces)
         {
-            if (molaMesh.Vertices[i].y > 0)
+            Vec3[] face_vertices = UtilsVertex.face_vertices(molaMesh, face);
+
+            float extrudingHeight = UtilsFace.FaceAngleVertical(face_vertices);
+            extrudingHeight = Mathf.Abs(Mathf.PI - Mathf.Abs(extrudingHeight));
+            extrudingHeight = Mathf.Remap(extrudingHeight, -Mathf.PI / 2, Mathf.PI / 2, extrudeHeightMin, extrudeHeightMax);
+
+            float extrudingFraction = UtilsFace.FaceCenterY(face_vertices);
+            extrudingFraction = Mathf.Remap(extrudingFraction, -size / 2, size / 2, fractiontMin, fractionMax);
+
+            bool capTop = false;
+            if (UtilsFace.FaceCenterY(face_vertices) < 0)
             {
-                molaMesh.Vertices[i] += new Vec3(0, molaMesh.Vertices[i].y * 0.8f, 0);
+                capTop = true;
             }
+
+            List<Vec3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(
+                molaMesh, face, extrudingHeight, extrudingFraction, capTop);
+
+            newMesh.AddFaces(new_faces_vertices);
         }
-
-        // get attribute 1 for extruding height
-        List<float> attribute1 = molaMesh.FaceProperties(UtilsFace.FaceAngleVertical);
-        for (int i = 0; i < attribute1.Count; i++)
-        {
-            attribute1[i] = Mola.Mathf.Abs(Mathf.PI - Mathf.Abs(attribute1[i]));
-        }
-        attribute1 = Mathf.MapList(attribute1, extrudeHeightMin, extrudeHeightMax);
-
-        // get attribute 2 for fraction
-        List<float> attribute2 = molaMesh.FaceProperties(UtilsFace.FaceCenterY);
-        attribute2 = Mathf.MapList(attribute2, fractionMax, fractiontMin);
-
-        // get attribute 3 for capTop
-        List<bool> attribute3 = new List<bool>(new bool[molaMesh.FacesCount()]);
-        for (int i = 0; i < attribute3.Count; i++)
-        {
-            if (attribute2[i] > 0.2) attribute3[i] = false;
-            else attribute3[i] = true;
-        }
-
-        molaMesh = MeshSubdivision.SubdivideMeshExtrudeTapered(molaMesh, attribute1, attribute2, attribute3);
-        molaMesh = UtilsMesh.MeshOffset(molaMesh, offsetDepth, true);
+        molaMesh = newMesh;
 
         // get attribute 4 for color
         List<float> attribute = molaMesh.FaceProperties(UtilsFace.FaceCenterY);
@@ -73,6 +69,7 @@ public class SubdWithCondition : MonoBehaviour
         {
             HDMeshToUnity.FillUnityMesh(unityMesh, molaMesh);
         }
+
     }
     private Mesh InitMesh()
     {
