@@ -33,7 +33,7 @@ public class BuildingGeneratingFacade : MolaMonoBehaviour
             MolaMesh roof = new MolaMesh();
             Vec3[] face_vertices = floor.FaceVertices(0);
             float height = Random.Range(1, 5);
-            result_faces_vertices = MeshSubdivision.SubdivideFaceExtrude(face_vertices, height);
+            result_faces_vertices = FaceSubdivision.Extrude(face_vertices, height);
 
             for (int j = 0; j < result_faces_vertices.Count - 1; j++)
             {
@@ -56,7 +56,7 @@ public class BuildingGeneratingFacade : MolaMonoBehaviour
                 Vec3[] face_vertices = wall.FaceVertices(i);
                 if (compactness[i] < 0.8) // always select faces with smaller compactness to further subdivide 
                 {
-                    result_faces_vertices = MeshSubdivision.SubdivideFaceGrid(face_vertices, 3, 1);
+                    result_faces_vertices = FaceSubdivision.Grid(face_vertices, 3, 1);
                     subWall.AddFaces(result_faces_vertices);
                 }
                 else
@@ -76,7 +76,7 @@ public class BuildingGeneratingFacade : MolaMonoBehaviour
         for (int i = 0; i < wall.FacesCount(); i++)
         {
             Vec3[] face_vertices = wall.FaceVertices(i);
-            result_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(face_vertices, extrudingHeights[i], 0.2f);
+            result_faces_vertices = FaceSubdivision.ExtrudeTapered(face_vertices, extrudingHeights[i], 0.2f);
             for (int j = 0; j < result_faces_vertices.Count - 1; j++)
             {
                 newWall.AddFace(result_faces_vertices[j]);

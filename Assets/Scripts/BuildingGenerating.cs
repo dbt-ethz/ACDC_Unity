@@ -34,7 +34,7 @@ public class BuildingGenerating : MolaMonoBehaviour
         {
             MolaMesh roof = new MolaMesh();
             Vec3[] face_vertices = floor.FaceVertices(0);
-            result_faces_vertices = MeshSubdivision.SubdivideFaceExtrude(face_vertices, 3);
+            result_faces_vertices = FaceSubdivision.Extrude(face_vertices, 3);
 
             for (int j = 0; j < result_faces_vertices.Count - 1; j++)
             {
@@ -49,7 +49,7 @@ public class BuildingGenerating : MolaMonoBehaviour
         for (int i = 0; i < wall.FacesCount(); i++)
         {
             Vec3[] face_vertices = wall.FaceVertices(i);
-            result_faces_vertices = MeshSubdivision.SubdivideFaceGrid(face_vertices, 3, 1);
+            result_faces_vertices = FaceSubdivision.Grid(face_vertices, 3, 1);
             subWall.AddFaces(result_faces_vertices);
         }
         wall = subWall;
@@ -65,7 +65,7 @@ public class BuildingGenerating : MolaMonoBehaviour
 
                 if (Random.value < 0.2) // select 20% of wall panels to extrude
                 {
-                    result_faces_vertices = MeshSubdivision.SubdivideFaceExtrude(face_vertices, extrudeLength);
+                    result_faces_vertices = FaceSubdivision.Extrude(face_vertices, extrudeLength);
                     for (int j = 0; j < result_faces_vertices.Count; j++)
                     {
                         if (Mola.Mathf.Abs(UtilsFace.FaceAngleVertical(result_faces_vertices[j])) < 0.1f) // if the face is facing sideways 
@@ -94,7 +94,7 @@ public class BuildingGenerating : MolaMonoBehaviour
             Vec3[] face_vertices = wall.FaceVertices(i);
             if (Random.value < 0.4)
             {
-                result_faces_vertices = MeshSubdivision.SubdivideFaceGrid(face_vertices, 3, 1);
+                result_faces_vertices = FaceSubdivision.Grid(face_vertices, 3, 1);
                 window.AddFaces(result_faces_vertices);
             }
             else
@@ -111,7 +111,7 @@ public class BuildingGenerating : MolaMonoBehaviour
         for (int i = 0; i < window.FacesCount(); i++)
         {
             Vec3[] face_vertices = window.FaceVertices(i);
-            result_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(face_vertices, 0, 0.2f);
+            result_faces_vertices = FaceSubdivision.ExtrudeTapered(face_vertices, 0, 0.2f);
             for (int j = 0; j < result_faces_vertices.Count - 1; j++)
             {
                 frame.AddFace(result_faces_vertices[j]);

@@ -40,7 +40,7 @@ public class SingleHouseGenerating : MolaMonoBehaviour
         {
             roof = new MolaMesh(); // prepare for receiving new roof
             Vec3[] floor_face_vertices = floor.FaceVertices(0);
-            result_faces_vertices = MeshSubdivision.SubdivideFaceExtrude(floor_face_vertices, height);
+            result_faces_vertices = FaceSubdivision.Extrude(floor_face_vertices, height);
             for (int i = 0; i < result_faces_vertices.Count; i++) // fist 4 items in the list
             {
                 if (i == 4)
@@ -61,7 +61,7 @@ public class SingleHouseGenerating : MolaMonoBehaviour
         for (int i = 0; i < wall.FacesCount(); i++)
         {
             Vec3[] face_vertices = wall.FaceVertices(i);
-            result_faces_vertices = MeshSubdivision.SubdivideFaceGrid(face_vertices, 3, 3);
+            result_faces_vertices = FaceSubdivision.Grid(face_vertices, 3, 3);
             subWall.AddFaces(result_faces_vertices);
         }
         wall = subWall;
@@ -75,7 +75,7 @@ public class SingleHouseGenerating : MolaMonoBehaviour
             // select a portion of walls to generate windows
             if(Random.value > 0.5)
             {
-                result_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(face_vertices, 0, fraction);
+                result_faces_vertices = FaceSubdivision.ExtrudeTapered(face_vertices, 0, fraction);
                 for (int j = 0; j < result_faces_vertices.Count - 1; j++)
                 {
                     newWall.AddFace(result_faces_vertices[j]);
@@ -91,7 +91,7 @@ public class SingleHouseGenerating : MolaMonoBehaviour
 
         MolaMesh newRoof = new MolaMesh();
         Vec3[] roof_face_vertices = roof.FaceVertices(0);
-        result_faces_vertices = MeshSubdivision.SubdivideFaceSplitRoof(roof_face_vertices, roofHeight);
+        result_faces_vertices = FaceSubdivision.Roof(roof_face_vertices, roofHeight);
         newRoof.AddFaces(result_faces_vertices);
         roof = newRoof;
 

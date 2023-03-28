@@ -69,7 +69,7 @@ public class SubMeshBehaviour : MonoBehaviour
         for (int i = 0; i < block.FacesCount(); i++)
         {
             Vec3[] face_vertices = block.FaceVertices(i);
-            List<Vec3[]> new_faces_vertices = MeshSubdivision.SubdivideFaceExtrudeTapered(face_vertices, 0, 0.2f, true);
+            List<Vec3[]> new_faces_vertices = FaceSubdivision.ExtrudeTapered(face_vertices, 0, 0.2f, true);
             for (int j = 0; j < new_faces_vertices.Count - 1; j++)
             {
                 road.AddFace(new_faces_vertices[j]);
