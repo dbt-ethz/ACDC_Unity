@@ -21,9 +21,12 @@ public class BuildingGeneratingFacade : MolaMonoBehaviour
     }
     private void UpdateGeometry()
     {
+        // create floor
         MolaMesh floor = MeshFactory.CreateSingleQuad(0, 0, 0, 10, 0, 0, 10, 0, 8, 0, 0, 8, true);
+        // vec3 list to always receive the subdivision result
         List<Vec3[]> result_faces_vertices = new List<Vec3[]>();
 
+        // generating wall and roof for multiple layers
         MolaMesh wall = new MolaMesh();
         for (int i = 0; i < floors; i++)
         {
@@ -40,32 +43,32 @@ public class BuildingGeneratingFacade : MolaMonoBehaviour
             floor = roof;
         }
 
-        MolaMesh oldWall = new MolaMesh();
-        
+        MolaMesh nonSubWall = new MolaMesh();
         for (int j = 0; j < 4; j++)
         {
             MolaMesh subWall = new MolaMesh();
+            // calculate the "compactness" of each face, collect values into a list
             List<float> compactness = wall.FaceProperties(UtilsFace.FaceCompactness);
+            // map the list to domain 0-1
             compactness = Mola.Mathf.MapList(compactness);
             for (int i = 0; i < wall.FacesCount(); i++)
             {
                 Vec3[] face_vertices = wall.FaceVertices(i);
-                if (compactness[i] < 0.8)
+                if (compactness[i] < 0.8) // always select faces with smaller compactness to further subdivide 
                 {
-                    if (j % 2 == 0) result_faces_vertices = MeshSubdivision.SubdivideFaceGrid(face_vertices, 3, 1);
-                    else result_faces_vertices = MeshSubdivision.SubdivideFaceGrid(face_vertices, 3, 1);
-
+                    result_faces_vertices = MeshSubdivision.SubdivideFaceGrid(face_vertices, 3, 1);
                     subWall.AddFaces(result_faces_vertices);
                 }
                 else
                 {
-                    oldWall.AddFace(face_vertices);
+                    nonSubWall.AddFace(face_vertices);
                 }
             }
             wall = subWall;
         }
-        wall.AddMesh(oldWall);
+        wall.AddMesh(nonSubWall); // combine two meshes.
 
+        // create window
         MolaMesh window = new MolaMesh();
         MolaMesh newWall = new MolaMesh();
         List<float> extrudingHeights = wall.FaceProperties(UtilsFace.FaceAreaTriOrQuad);
