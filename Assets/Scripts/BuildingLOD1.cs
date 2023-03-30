@@ -9,8 +9,12 @@ public class BuildingLOD1 : MolaMonoBehaviour
 {
     [Range(0, 10)]
     public int seed = 5;
-    public BuildingLOD2 LOD2;
+    [Range(0, 8)]
+    public float extrudeLength = 2;
+    
+
     public List<MolaMesh> molaMeshes;
+    public BuildingLOD2 LOD2;
     public BuildingLOD0 LOD0;
 
     void Start()
@@ -34,6 +38,7 @@ public class BuildingLOD1 : MolaMonoBehaviour
             {
                 wall = molaMeshes[0];
                 roof = molaMeshes[1];
+                Debug.Log("inherit roof: " + roof.FacesCount());
             } 
         }
 
@@ -41,24 +46,27 @@ public class BuildingLOD1 : MolaMonoBehaviour
         wall = MeshSubdivision.SubdivideMeshGrid(wall, 3, 3);
  
         MolaMesh newWall = new MolaMesh();
-        bool[] randomMusk = new bool[wall.FacesCount()];
-        for (int i = 0; i < randomMusk.Length; i++)
+        bool[] randomMask = new bool[wall.FacesCount()];
+        for (int i = 0; i < randomMask.Length; i++)
         {
-            if (UnityEngine.Random.value > 0.5) randomMusk[i] = true;
-            else randomMusk[i] = false;
+            if (UnityEngine.Random.value > 0.5) randomMask[i] = true;
         }
-        newWall = wall.CopySubMesh(randomMusk);
-        newWall = MeshSubdivision.SubdivideMeshExtrude(newWall, 3);
+        newWall = wall.CopySubMesh(randomMask);
+        newWall = MeshSubdivision.SubdivideMeshExtrude(newWall, extrudeLength);
 
         MolaMesh floor = new MolaMesh();
         floor = newWall.CopySubMesh(face => Mola.Mathf.Abs(UtilsFace.FaceAngleVertical(UtilsVertex.face_vertices(newWall, face))) >= 1);
         newWall = newWall.CopySubMesh(face => Mola.Mathf.Abs(UtilsFace.FaceAngleVertical(UtilsVertex.face_vertices(newWall, face))) <1);
 
-        randomMusk = randomMusk.Select(a => !a).ToArray();
-        wall = wall.CopySubMesh(randomMusk);
+        randomMask = randomMask.Select(a => !a).ToArray();
+        wall = wall.CopySubMesh(randomMask);
         wall.AddMesh(newWall);
+        Debug.Log("roof " + roof.FacesCount());
+        Debug.Log("floor " + floor.FacesCount());
+        
 
         roof.AddMesh(floor);
+        Debug.Log("roof after" + roof.FacesCount());
 
         molaMeshes = new List<MolaMesh>() { wall, roof };
 

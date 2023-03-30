@@ -36,53 +36,11 @@ public class VoxelBehaviour : MolaMonoBehaviour
         MolaGrid<bool> sphere2 = SphereGrid(centerPt, radius*0.8f);
 
         // create cube
-        MolaGrid<bool> cube = CubeGrid(10, 10, 10, 20, 30, 50);
+        MolaGrid<bool> cube = BoxGrid(10, 10, 10, 20, 30, 50);
 
-        MolaGrid<bool>  result = GridBooleanUnionList(new List<MolaGrid<bool>> { sphere, sphere2, cube });
+        MolaGrid<bool>  result = UtilsGrid.GridBooleanUnionList(new List<MolaGrid<bool>> { sphere, sphere2, cube });
         MolaMesh molaMesh = UtilsGrid.VoxelMesh(result, Color.red);
         FillUnityMesh(molaMesh);
-    }
-
-    private MolaGrid<bool> GridBooleanUnion(MolaGrid<bool> grid1, MolaGrid<bool> grid2)
-    {
-        MolaGrid<bool> result = new MolaGrid<bool>(nX, nY, nZ);
-        for (int i = 0; i < result.Count; i++)
-        {
-            result[i] = grid1[i] || grid2[i];
-        }
-        return result;
-    }
-    private MolaGrid<bool> GridBooleanUnionList(List<MolaGrid<bool>> grids)
-    {
-        MolaGrid<bool> result = new MolaGrid<bool>(nX, nY, nZ);
-
-        var listsOfLists = new List<IEnumerable<bool>>();
-        foreach (MolaGrid<bool> grid in grids)
-        {
-            listsOfLists.Add(grid.Values);
-        }
-        var combinedResults = listsOfLists.Aggregate((a, b) => a.Zip(b, (aElement, bElement) => aElement || bElement));
-        result.Values = combinedResults.ToList();
-
-        return result;
-    }
-    private MolaGrid<bool> GridBooleanIntersection(MolaGrid<bool> grid1, MolaGrid<bool> grid2)
-    {
-        MolaGrid<bool> result = new MolaGrid<bool>(nX, nY, nZ);
-        for (int i = 0; i < result.Count; i++)
-        {
-            result[i] = grid1[i] && grid2[i];
-        }
-        return result;
-    }
-    private MolaGrid<bool> GridBooleanDifference(MolaGrid<bool> grid1, MolaGrid<bool> grid2)
-    {
-        MolaGrid<bool> result = new MolaGrid<bool>(nX, nY, nZ);
-        for (int i = 0; i < result.Count; i++)
-        {
-            result[i] = grid1[i] && ! grid2[i];
-        }
-        return result;
     }
 
     private MolaGrid<bool> SphereGrid( Vec3 centerPt, float radius)
@@ -112,7 +70,7 @@ public class VoxelBehaviour : MolaMonoBehaviour
         }
         return grid;
     }
-    private MolaGrid<bool> CubeGrid(int x1, int y1, int z1, int x2, int y2, int z2)
+    private MolaGrid<bool> BoxGrid(int x1, int y1, int z1, int x2, int y2, int z2)
     {
         MolaGrid<bool> grid = new MolaGrid<bool>(nX, nY, nZ);
         for (int x = x1; x < x2; x++)

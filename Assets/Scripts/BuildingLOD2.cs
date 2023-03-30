@@ -34,6 +34,8 @@ public class BuildingLOD2 : MolaMonoBehaviour
 
         floor = MeshSubdivision.SubdivideMeshExtrude(floor, height);
         roof = floor.CopySubMesh(4, false);
+        Debug.Log("original roof: " + roof.FacesCount()
+            );
         wall = floor.CopySubMesh(new List<int>() { 0, 1, 2, 3 });
 
 

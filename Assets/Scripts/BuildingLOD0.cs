@@ -31,8 +31,6 @@ public class BuildingLOD0 : MolaMonoBehaviour
             molaMeshes = LOD1.molaMeshes;
             if (molaMeshes != null)
             {
-                //wall = molaMeshes.Find(item => item.Name == "wall");
-                //roof = molaMeshes.Find(item => item.Name == "roof");
                 wall = molaMeshes[0];
                 roof = molaMeshes[1];
             }
