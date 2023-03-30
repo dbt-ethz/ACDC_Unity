@@ -6,9 +6,9 @@ using System;
 using Random = UnityEngine.Random;
 using Mathf = Mola.Mathf;
 using Color = Mola.Color;
+using System.Linq;
 
-[ExecuteInEditMode]
-public class VoxelBehaviour : MonoBehaviour
+public class VoxelBehaviour : MolaMonoBehaviour
 {
     public int nX = 100;
     public int nY = 100;
@@ -16,40 +16,78 @@ public class VoxelBehaviour : MonoBehaviour
     [Range(0, 50)]
     public float radius = 0;
 
-    private MolaGrid<bool> grid;
-    private Mesh mesh;
-
     void Start()
     {
-        Debug.Log("start is called");
-        //InitMesh();
+        InitMesh();
+        UpdateGeometry();
     }
-
     private void OnValidate()
     {
-        InitMesh();
-        InitGrid();
-        SphereGrid(new Vector3(20, 20, 20), radius);
-        MolaMesh molaMesh = UtilsGrid.VoxelMesh(grid, Color.red);
-        Debug.Log($"quad count: {molaMesh.FacesCount()}");
-        HDMeshToUnity.FillUnityMesh(mesh, molaMesh);
+        UpdateGeometry();
+    }
+    private void UpdateGeometry()
+    {
+        // create sphere
+        Vec3 centerPt = new Vec3(20, 20, 20);
+        MolaGrid<bool> sphere = SphereGrid(centerPt, radius);
+
+        // create sphere2
+        centerPt = new Vec3(30, 30, 30);
+        MolaGrid<bool> sphere2 = SphereGrid(centerPt, radius*0.8f);
+
+        // create cube
+        MolaGrid<bool> cube = CubeGrid(10, 10, 10, 20, 30, 50);
+
+        MolaGrid<bool>  result = GridBooleanUnionList(new List<MolaGrid<bool>> { sphere, sphere2, cube });
+        MolaMesh molaMesh = UtilsGrid.VoxelMesh(result, Color.red);
+        FillUnityMesh(molaMesh);
     }
 
-    private void InitGrid()
+    private MolaGrid<bool> GridBooleanUnion(MolaGrid<bool> grid1, MolaGrid<bool> grid2)
     {
-        grid = new MolaGrid<bool>(nX, nY, nZ);
-    }
-
-    private void RandomGrid()
-    {
-        for (int i = 0; i < grid.Count; i++)
+        MolaGrid<bool> result = new MolaGrid<bool>(nX, nY, nZ);
+        for (int i = 0; i < result.Count; i++)
         {
-            grid[i] = Random.value > 0.5;
+            result[i] = grid1[i] || grid2[i];
         }
+        return result;
+    }
+    private MolaGrid<bool> GridBooleanUnionList(List<MolaGrid<bool>> grids)
+    {
+        MolaGrid<bool> result = new MolaGrid<bool>(nX, nY, nZ);
+
+        var listsOfLists = new List<IEnumerable<bool>>();
+        foreach (MolaGrid<bool> grid in grids)
+        {
+            listsOfLists.Add(grid.Values);
+        }
+        var combinedResults = listsOfLists.Aggregate((a, b) => a.Zip(b, (aElement, bElement) => aElement || bElement));
+        result.Values = combinedResults.ToList();
+
+        return result;
+    }
+    private MolaGrid<bool> GridBooleanIntersection(MolaGrid<bool> grid1, MolaGrid<bool> grid2)
+    {
+        MolaGrid<bool> result = new MolaGrid<bool>(nX, nY, nZ);
+        for (int i = 0; i < result.Count; i++)
+        {
+            result[i] = grid1[i] && grid2[i];
+        }
+        return result;
+    }
+    private MolaGrid<bool> GridBooleanDifference(MolaGrid<bool> grid1, MolaGrid<bool> grid2)
+    {
+        MolaGrid<bool> result = new MolaGrid<bool>(nX, nY, nZ);
+        for (int i = 0; i < result.Count; i++)
+        {
+            result[i] = grid1[i] && ! grid2[i];
+        }
+        return result;
     }
 
-    private void SphereGrid(Vector3 centerPt, float radius)
+    private MolaGrid<bool> SphereGrid( Vec3 centerPt, float radius)
     {
+        MolaGrid<bool> grid = new MolaGrid<bool>(nX, nY, nZ);
         float radiusSquare = Mathf.Pow(radius, 2);
         for (int i = 0; i < grid.Count; i++)
         {
@@ -63,16 +101,25 @@ public class VoxelBehaviour : MonoBehaviour
                 grid[i] = true;
             }
         }
+        return grid;
     }
-
-    private MolaGrid<bool> CustomizedGrid(int nX, int nY, int nZ)
+    private MolaGrid<bool> RandomGrid()
     {
         MolaGrid<bool> grid = new MolaGrid<bool>(nX, nY, nZ);
-        for (int x = 10; x < 20; x++)
+        for (int i = 0; i < grid.Count; i++)
         {
-            for (int y = 0; y < 30; y++)
+            grid[i] = Random.value > 0.5;
+        }
+        return grid;
+    }
+    private MolaGrid<bool> CubeGrid(int x1, int y1, int z1, int x2, int y2, int z2)
+    {
+        MolaGrid<bool> grid = new MolaGrid<bool>(nX, nY, nZ);
+        for (int x = x1; x < x2; x++)
+        {
+            for (int y = y1; y < y2; y++)
             {
-                for (int z = 10; z < 25; z++)
+                for (int z = z1; z < z2; z++)
                 {
                     grid[x, y, z] = true;
                 }
@@ -80,30 +127,8 @@ public class VoxelBehaviour : MonoBehaviour
         }
         return grid;
     }
-
     private MolaGrid<bool> GyroidGrid(int nX, int nY, int nZ)
     {
         throw new NotImplementedException();
-    }
-
-    private void InitMesh()
-    {
-        // init mesh filter
-        MeshFilter meshFilter = GetComponent<MeshFilter>();
-        if (null == meshFilter)
-        {
-            meshFilter = this.gameObject.AddComponent<MeshFilter>();
-        }
-        mesh = new Mesh();
-        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-        meshFilter.mesh = mesh;
-
-        // init mesh renderer
-        MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
-        if (renderer == null)
-        {
-            renderer = gameObject.AddComponent<MeshRenderer>();
-        }
-        renderer.material = new Material(Shader.Find("Particles/Standard Surface"));
     }
 }
