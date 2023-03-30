@@ -9,8 +9,10 @@ public class BuildingLOD0 : MolaMonoBehaviour
 {
     [Range(0, 10)]
     public int seed = 5;
-    public List<MolaMesh> molaMeshes;
-    public BuildingLOD1 LOD1;
+    [Range(0, 3)]
+    public float extrudingHeight = 0.5f;
+    [Range(0, 1)]
+    public float fraction = 0.2f;
 
     void Start()
     {
@@ -21,29 +23,27 @@ public class BuildingLOD0 : MolaMonoBehaviour
     {
         UpdateGeometry();
     }
-    public void UpdateGeometry()
+    public override void UpdateGeometry()
     {
         // inherit from previous level
+        molaMeshes = GetMeshFromLOD();
         MolaMesh wall = new MolaMesh();
         MolaMesh roof = new MolaMesh();
-        if (LOD1 != null)
+        if (molaMeshes.Any())
         {
-            molaMeshes = LOD1.molaMeshes;
-            if (molaMeshes != null)
-            {
-                wall = molaMeshes[0];
-                roof = molaMeshes[1];
-            }
+            wall = molaMeshes[0];
+            roof = molaMeshes[1];
         }
 
         // operation in current level
         MolaMesh window = new MolaMesh();
-        wall = MeshSubdivision.SubdivideMeshExtrudeTapered(wall, 1, 0.2f);
+        wall = MeshSubdivision.SubdivideMeshExtrudeTapered(wall, extrudingHeight, fraction);
 
+        // seperate mesh into wall and window by index. every 5th face is window
         bool[] indexMusk = new bool[wall.FacesCount()];
         for (int i = 0; i < wall.FacesCount(); i++)
         {
-            indexMusk[i] = i % 4 == 0;
+            indexMusk[i] = (i+1) % 5 == 0; // get every 5th item
         }
         window = wall.CopySubMesh(indexMusk);
 

@@ -19,7 +19,7 @@ public class BuildingGeneratingFacade : MolaMonoBehaviour
     {
         UpdateGeometry();
     }
-    private void UpdateGeometry()
+    public override void UpdateGeometry()
     {
         // create floor
         MolaMesh floor = MeshFactory.CreateSingleQuad(0, 0, 0, 10, 0, 0, 10, 0, 8, 0, 0, 8, true);

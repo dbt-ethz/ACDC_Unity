@@ -27,7 +27,7 @@ public class SingleHouseGenerating : MolaMonoBehaviour
     {
         UpdateGeometry();
     }
-    private void UpdateGeometry()
+    public override void UpdateGeometry()
     {
         // create floor
         MolaMesh floor = MeshFactory.CreateSingleQuad(0, 0, 0, length, 0, 0, length, 0, width, 0, 0, width, true);

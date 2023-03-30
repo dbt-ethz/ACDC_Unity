@@ -12,11 +12,6 @@ public class BuildingLOD1 : MolaMonoBehaviour
     [Range(0, 8)]
     public float extrudeLength = 2;
     
-
-    public List<MolaMesh> molaMeshes;
-    public BuildingLOD2 LOD2;
-    public BuildingLOD0 LOD0;
-
     void Start()
     {
         InitMesh();
@@ -26,25 +21,23 @@ public class BuildingLOD1 : MolaMonoBehaviour
     {
         UpdateGeometry();
     }
-    public void UpdateGeometry()
+    public override void UpdateGeometry()
     {
         // inherit from previous level
+        molaMeshes = GetMeshFromLOD();
         MolaMesh wall = new MolaMesh();
         MolaMesh roof = new MolaMesh();
-        if (LOD2 != null)
+        if (molaMeshes.Any())
         {
-            molaMeshes = LOD2.molaMeshes;
-            if(molaMeshes != null)
-            {
-                wall = molaMeshes[0];
-                roof = molaMeshes[1];
-                Debug.Log("inherit roof: " + roof.FacesCount());
-            } 
+            wall = molaMeshes[0];
+            roof = molaMeshes[1];
         }
-
+        // operate in current level
+        #region operation in current level
         // operation in current level
         wall = MeshSubdivision.SubdivideMeshGrid(wall, 3, 3);
- 
+        
+        // seperate wall mesh into 2 meshes by random
         MolaMesh newWall = new MolaMesh();
         bool[] randomMask = new bool[wall.FacesCount()];
         for (int i = 0; i < randomMask.Length; i++)
@@ -52,31 +45,36 @@ public class BuildingLOD1 : MolaMonoBehaviour
             if (UnityEngine.Random.value > 0.5) randomMask[i] = true;
         }
         newWall = wall.CopySubMesh(randomMask);
-        newWall = MeshSubdivision.SubdivideMeshExtrude(newWall, extrudeLength);
-
-        MolaMesh floor = new MolaMesh();
-        floor = newWall.CopySubMesh(face => Mola.Mathf.Abs(UtilsFace.FaceAngleVertical(UtilsVertex.face_vertices(newWall, face))) >= 1);
-        newWall = newWall.CopySubMesh(face => Mola.Mathf.Abs(UtilsFace.FaceAngleVertical(UtilsVertex.face_vertices(newWall, face))) <1);
-
         randomMask = randomMask.Select(a => !a).ToArray();
         wall = wall.CopySubMesh(randomMask);
-        wall.AddMesh(newWall);
-        Debug.Log("roof " + roof.FacesCount());
-        Debug.Log("floor " + floor.FacesCount());
-        
 
-        roof.AddMesh(floor);
-        Debug.Log("roof after" + roof.FacesCount());
+        // operate subdivision on one mesh
+        newWall = MeshSubdivision.SubdivideMeshExtrude(newWall, extrudeLength);
 
-        molaMeshes = new List<MolaMesh>() { wall, roof };
+        // seperate result mesh into floor and wall by orientation
+        MolaMesh floor = new MolaMesh();
+        bool[] orientationMask = new bool[newWall.FacesCount()];
+        for (int i = 0; i < orientationMask.Length; i++)
+        {
+            if(Mola.Mathf.Abs(UtilsFace.FaceAngleVertical(newWall.FaceVertices(i))) > 1)
+            {
+                orientationMask[i] = true;
+            }
+        }
+        floor = newWall.CopySubMesh(orientationMask);
+        orientationMask = orientationMask.Select(a => !a).ToArray();
+        newWall = newWall.CopySubMesh(orientationMask);
+
+        wall.AddMesh(newWall); // put wall together
+        roof.AddMesh(floor); // add floor to previous roof
+
+        molaMeshes = new List<MolaMesh>() { wall, roof};
 
         FillUnitySubMesh(molaMeshes);
         ColorSubMeshRandom();
+        #endregion
 
-        // update next level
-        if (LOD0 != null)
-        {
-            LOD0.UpdateGeometry();
-        }
+        // update other level
+        UpdateLOD();
     }
 }

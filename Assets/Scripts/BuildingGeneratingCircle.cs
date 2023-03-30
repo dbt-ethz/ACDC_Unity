@@ -23,7 +23,7 @@ public class BuildingGeneratingCircle : MolaMonoBehaviour
     {
         UpdateGeometry();
     }
-    private void UpdateGeometry()
+    public override void UpdateGeometry()
     {
         // create floor
         MolaMesh floor = MeshFactory.CreateCircle(0, 10, 0, 10, nSegments);

@@ -6,7 +6,6 @@ using System;
 using Random = UnityEngine.Random;
 using Mathf = Mola.Mathf;
 using Color = Mola.Color;
-using System.Linq;
 
 public class VoxelBehaviour : MolaMonoBehaviour
 {
@@ -25,7 +24,7 @@ public class VoxelBehaviour : MolaMonoBehaviour
     {
         UpdateGeometry();
     }
-    private void UpdateGeometry()
+    public override void UpdateGeometry()
     {
         // create sphere
         Vec3 centerPt = new Vec3(20, 20, 20);
