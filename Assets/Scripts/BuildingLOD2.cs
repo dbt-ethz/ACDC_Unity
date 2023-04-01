@@ -10,7 +10,7 @@ public class BuildingLOD2 : MolaMonoBehaviour
     public float length = 10;
     [Range(3, 20)]
     public float width = 8;
-    [Range(3, 5)]
+    [Range(3, 20)]
     public float height = 4;
 
     void Start()

@@ -66,6 +66,7 @@ public class BuildingLOD1 : MolaMonoBehaviour
         newWall = newWall.CopySubMesh(orientationMask);
 
         wall.AddMesh(newWall); // put wall together
+
         roof.AddMesh(floor); // add floor to previous roof
 
         molaMeshes = new List<MolaMesh>() { wall, roof};
