@@ -33,8 +33,6 @@ public class BuildingLOD1 : MolaMonoBehaviour
             roof = molaMeshes[1];
         }
         // operate in current level
-        #region operation in current level
-        // operation in current level
         wall = MeshSubdivision.SubdivideMeshGrid(wall, 3, 3);
         
         // seperate wall mesh into 2 meshes by random
@@ -52,7 +50,7 @@ public class BuildingLOD1 : MolaMonoBehaviour
         newWall = MeshSubdivision.SubdivideMeshExtrude(newWall, extrudeLength);
 
         // seperate result mesh into floor and wall by orientation
-        MolaMesh floor = new MolaMesh();
+        MolaMesh newRoof = new MolaMesh();
         bool[] orientationMask = new bool[newWall.FacesCount()];
         for (int i = 0; i < orientationMask.Length; i++)
         {
@@ -61,21 +59,20 @@ public class BuildingLOD1 : MolaMonoBehaviour
                 orientationMask[i] = true;
             }
         }
-        floor = newWall.CopySubMesh(orientationMask);
+        newRoof = newWall.CopySubMesh(orientationMask);
         orientationMask = orientationMask.Select(a => !a).ToArray();
         newWall = newWall.CopySubMesh(orientationMask);
 
         wall.AddMesh(newWall); // put wall together
 
-        roof.AddMesh(floor); // add floor to previous roof
+        roof.AddMesh(newRoof); // put roof together
 
         molaMeshes = new List<MolaMesh>() { wall, roof};
 
         FillUnitySubMesh(molaMeshes);
         ColorSubMeshRandom();
-        #endregion
 
-        // update other level
+        // update next level: LOD0
         UpdateLOD();
     }
 }

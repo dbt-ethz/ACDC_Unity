@@ -67,7 +67,7 @@ public class Building2_LOD0 : MolaMonoBehaviour
             if (UnityEngine.Random.value < 0.5f) randomMask[i] = true;
         }
         MolaMesh newRoof = roof.CopySubMesh(randomMask);
-        indexMask = indexMask.Select(a => !a).ToArray();
+        randomMask = randomMask.Select(a => !a).ToArray();
         roof = roof.CopySubMesh(randomMask);
 
         //
@@ -87,6 +87,7 @@ public class Building2_LOD0 : MolaMonoBehaviour
         roof.AddMesh(newRoof);
 
         molaMeshes = new List<MolaMesh>() { floor, wall, newWall, window, roof, garden, balustrade };
+
         FillUnitySubMesh(molaMeshes);
         // create color 
         UnityEngine.Color[] colors = new UnityEngine.Color[molaMeshes.Count];

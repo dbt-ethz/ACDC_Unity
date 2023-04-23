@@ -31,14 +31,20 @@ public class BuildingLOD2 : MolaMonoBehaviour
         MolaMesh roof = new MolaMesh();
 
         floor = MeshSubdivision.SubdivideMeshExtrude(floor, height);
+
+        // split the result into 2 meshes according to their index. could also do it according orientation, area, random etc. 
+        // 4 different ways to copy sub mesh
         roof = floor.CopySubMesh(4, false);
         wall = floor.CopySubMesh(new List<int>() { 0, 1, 2, 3 });
 
+        // store meshes in a list for next LOD level
         molaMeshes = new List<MolaMesh>() { wall, roof };
 
+        // visualize current LOD level
         FillUnitySubMesh(molaMeshes);
         ColorSubMeshRandom();
 
+        // update next levels: LOD1 and LOD0
         UpdateLOD();
     }
 }
