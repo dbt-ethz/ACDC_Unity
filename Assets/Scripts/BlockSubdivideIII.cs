@@ -6,13 +6,8 @@ using System.Linq;
 
 public class BlockSubdivideIII : MolaMonoBehaviour
 {
-    public float dimX = 274;
-    public float dimY = 80;
-    public float dimZ = 200;
     [Range(1, 5)]
-    public int iteration = 3;
-    [Range(0, 10)]
-    public int setback = 3;
+    public int iteration = 4;
     [Range(2, 50)]
     public int roadWidth = 7;
     [Range(0, 10)]
@@ -33,8 +28,9 @@ public class BlockSubdivideIII : MolaMonoBehaviour
     public override void UpdateGeometry()
     {
         // create plots and roads
-        MolaMesh block = MeshFactory.CreateSingleQuad(dimX / 2, -dimY / 2, 0, dimX / 2, dimY / 2, 0, -dimX / 2, dimY / 2, 0, -dimX / 2, -dimY / 2, 0, false);
-        
+        MolaMesh block = GetComponent<BlockFromMesh>().startMesh;
+        if (block == null) return;
+
         for (int i = 0; i < iteration; i++)
         {
             block = MeshSubdivision.SubdivideMeshSplitRelative(block, 0, 0.4f, 0.4f, 0.6f, 0.6f);
@@ -68,8 +64,8 @@ public class BlockSubdivideIII : MolaMonoBehaviour
         // instantiate new building prefabs for each plot mesh face
         for (int i = 0; i < plots.FacesCount(); i++)
         {
-            float x = plots.FaceEdgeLength(i, 0) - setback; // setback from the edge of plot face
-            float y = plots.FaceEdgeLength(i, 1) - setback;
+            float x = plots.FaceEdgeLength(i, 0); // setback from the edge of plot face
+            float y = plots.FaceEdgeLength(i, 1);
             if (x >= 5 && y >= 5) // minimal prefab size
             {
                 var prefabLoad = Resources.Load<GameObject>("LOD_GroupName"); // change to your prefab name. it has to be in "Resources" folder.

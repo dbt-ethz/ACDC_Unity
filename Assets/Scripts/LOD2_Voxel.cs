@@ -7,13 +7,6 @@ using Unity.XRTools.Utils;
 
 public class LOD2_Voxel : MolaMonoBehaviour
 {
-    [Range(5, 100)]
-    public int dimX = 30;
-    [Range(5, 100)]
-    public int dimY = 30;
-    [Range(1, 100)]
-    public int dimZ = 30;
-
     [Range(0.1f, 10)]
     public float scale = 3;
 
@@ -69,7 +62,7 @@ public class LOD2_Voxel : MolaMonoBehaviour
     }
     private MolaGrid<bool> GyroidGrid(float x = 0, float y = 0, float z = 0, float scale = 1)
     {
-        MolaGrid<bool> grid = new MolaGrid<bool>(dimX, dimY, dimZ);
+        MolaGrid<bool> grid = new MolaGrid<bool>((int)dimX, (int)dimY, (int)dimZ);
         for (int i = 0; i < grid.Count; i++)
         {
             float distValue = Mola.Mathf.Sin((grid.getX(i) - x) / scale) + Mola.Mathf.Sin((grid.getY(i) - y) / scale) + Mola.Mathf.Sin((grid.getZ(i) - z) / scale);
@@ -79,7 +72,7 @@ public class LOD2_Voxel : MolaMonoBehaviour
     }
     private MolaGrid<bool> ClippingGrid(Bounds bound,List<Vector3> polygon)
     {
-        MolaGrid<bool> grid = new MolaGrid<bool>(dimX, dimY, dimZ);
+        MolaGrid<bool> grid = new MolaGrid<bool>((int)dimX, (int)dimY, (int)dimZ);
         for (int i = 0; i < grid.Count; i++)
         {
             Vector3 v = new Vector3(grid.getX(i) - dimX / 2, 0, grid.getY(i) - dimY / 2) + bound.center;
@@ -92,7 +85,7 @@ public class LOD2_Voxel : MolaMonoBehaviour
     }
     private MolaGrid<bool> Solid()
     {
-        MolaGrid<bool> grid = new MolaGrid<bool>(dimX, dimY, dimZ);
+        MolaGrid<bool> grid = new MolaGrid<bool>((int)dimX, (int)dimY, (int)dimZ);
         for (int i = 0; i < grid.Count; i++)
         {
             grid[i] = true;

@@ -6,12 +6,7 @@ using System.Linq;
 
 public class CopySubMeshExamples : MolaMonoBehaviour
 {
-    [Range(5, 100)]
-    public float dimX = 10;
-    [Range(5, 100)]
-    public float dimY = 10;
-    [Range(5, 100)]
-    public float dimZ = 10;
+
     void Start()
     {
         InitMesh();

@@ -6,16 +6,8 @@ using System.Linq;
 
 public class LOD2_W : MolaMonoBehaviour
 {
-    [Range(5, 100)]
-    public float dimX = 10;
-    [Range(5, 100)]
-    public float dimY = 10;
-    [Range(5, 100)]
-    public float dimZ = 10;
-
-    [HideInInspector]
-    public MolaMesh startMesh;
-
+    [Range(0, 10)]
+    public int seed = 0;
     void Start()
     {
         InitMesh();
@@ -30,23 +22,26 @@ public class LOD2_W : MolaMonoBehaviour
     public override void UpdateGeometry()
     {
         // create mola mesh for current LOD level
-        MolaMesh molaMesh = MeshFactory.CreateSingleQuad(dimX / 2, -dimY / 2, 0, dimX / 2, dimY / 2, 0, -dimX / 2, dimY / 2, 0, -dimX / 2, -dimY / 2, 0, false);
-        MolaMesh floor = startMesh ?? molaMesh;
+        // take startMesh as starting point. if there is no startMesh, create default mesh with dimX, Y, Z
+        MolaMesh defaultMesh = MeshFactory.CreateSingleQuad(dimX / 2, -dimY / 2, 0, dimX / 2, dimY / 2, 0, -dimX / 2, dimY / 2, 0, -dimX / 2, -dimY / 2, 0, false);
+        MolaMesh floor = startMesh ?? defaultMesh;
 
-        MolaMesh wall = new MolaMesh();
-        MolaMesh roof = new MolaMesh();
+        MolaMesh wall; 
+        MolaMesh roof;
 
         floor = MeshSubdivision.SubdivideMeshExtrude(floor, dimZ);
 
         roof = floor.CopySubMesh(floor.FacesCount()-1, false);
-        List<int> myList = Enumerable.Range(0, (floor.FacesCount() - 1)).ToList();
-        wall = floor.CopySubMesh(myList);
+        List<int> myList = new List<int>();
+        for (int i = 0; i < floor.FacesCount() - 1; i++)
+        {
+            myList.Add(i);
+        }
 
+        wall = floor.CopySubMesh(myList);
 
         // store meshes in a list for next LOD level
         molaMeshes = new List<MolaMesh>() { wall, roof };
-
-        // flip mesh YZ only for unity visualization
 
         // visualize mesh in current LOD level 
         FillUnitySubMesh(molaMeshes, true);

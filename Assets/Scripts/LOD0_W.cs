@@ -11,7 +11,6 @@ public class LOD0_W : MolaMonoBehaviour
     [Range(0, 1)]
     public float windowRatio = 0.8f;
 
-
     void Start()
     {
         InitMesh();

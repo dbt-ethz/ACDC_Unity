@@ -6,13 +6,13 @@ using System.Linq;
 
 public class CitySubdivide : MolaMonoBehaviour
 {
-    public float dimX = 1000;
-    public float dimY = 500;
-    public float dimZ = 200;
+    public float cityDimX = 1000;
+    public float cityDimY = 600;
+    public float cityDimZ = 200;
     [Range(2, 50)]
     public int roadWidth = 20;
     [Range(1, 5)]
-    public int iteration = 5;
+    public int iteration = 4;
     [Range(0, 10)]
     public int seed = 0;
     void Start()
@@ -21,16 +21,9 @@ public class CitySubdivide : MolaMonoBehaviour
         UpdateGeometry();
     }
 
-    private void OnValidate()
-    {
-        // this is a by pass to allow deleting objects in OnValidate. Don't change it
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.delayCall += UpdateGeometry;
-#endif 
-    }
     public override void UpdateGeometry()
     {
-        MolaMesh city = MeshFactory.CreateSingleQuad(dimX / 2, -dimY / 2, 0, dimX / 2, dimY / 2, 0, -dimX / 2, dimY / 2, 0, -dimX / 2, -dimY / 2, 0, false);
+        MolaMesh city = MeshFactory.CreateSingleQuad(cityDimX / 2, -cityDimY / 2, 0, cityDimX / 2, cityDimY / 2, 0, -cityDimX / 2, cityDimY / 2, 0, -cityDimX / 2, -cityDimY / 2, 0, false);
 
         for (int i = 0; i < iteration; i++)
         {
@@ -49,7 +42,6 @@ public class CitySubdivide : MolaMonoBehaviour
         filterMask = filterMask.Select(a => !a).ToArray();
         MolaMesh road = city.CopySubMesh(filterMask);
         road.FlipFaces();
-        Debug.Log(blocks.FacesCount());
 
         molaMeshes = new List<MolaMesh> { road };
         FillUnitySubMesh(molaMeshes, true);
@@ -60,43 +52,41 @@ public class CitySubdivide : MolaMonoBehaviour
     }
     private void InstantiateBlocks(MolaMesh blocks)
     {
-        int n = transform.childCount;
-        for (int i = 0; i < n; i++)
-        {
-            // destroyimmediate will excute in each iteration, as a result always delete the first child because previous first child is gone
-            DestroyImmediate(transform.GetChild(0).gameObject);
-        }
-        string groupName = "PABCDEFGHIJKLMNO";
+        ClearChildrenImmediate();
 
+        string groupName = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        List<int> parks = new List<int> { 0};
+        int groupIndex = 0;
         for (int i = 0; i < blocks.FacesCount(); i++)
         {
+            int n = i / groupName.Length;
             GameObject blockGO = new GameObject();
-            blockGO.name = "Block" + groupName[i];
+            if (parks.Contains(i))
+            {
+                blockGO.name = "Park" + i + n;
+            }
+            else
+            {
+                if(n == 0) blockGO.name = "Block" + groupName[groupIndex];
+                else blockGO.name = "Block" + groupName[groupIndex] + n;
+
+                groupIndex++;
+            }
+
             blockGO.transform.parent = transform;
             MolaMesh blockMesh = blocks.CopySubMesh(i);
             InstantiateBlock(blockGO, blockMesh);
         }
+        Debug.Log("saved mesh");
     }
     private void InstantiateBlock(GameObject blockGO, MolaMesh molaMesh)
     {
-        Mesh blockUnityMesh = new Mesh();
-        blockUnityMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-        blockUnityMesh.MarkDynamic();
-        MeshFilter meshFilter = blockGO.GetComponent<MeshFilter>();
-        if (meshFilter == null)
+        // pass on molaMesh
+        BlockFromMesh blockFromMesh = GetComponent<BlockFromMesh>();
+        if(blockFromMesh == null)
         {
-            meshFilter = blockGO.AddComponent<MeshFilter>();
+            blockFromMesh = blockGO.AddComponent<BlockFromMesh>();
         }
-        
-        MeshRenderer meshRenderer = blockGO.GetComponent<MeshRenderer>();
-        if (meshRenderer == null)
-        {
-            meshRenderer = blockGO.AddComponent<MeshRenderer>();
-        }
-        meshRenderer.material = new Material(Shader.Find("Standard"));
-        meshRenderer.sharedMaterial.color = RandomColor();
-
-        meshFilter.mesh = blockUnityMesh;
-        HDMeshToUnity.FillUnityMesh(blockUnityMesh, molaMesh, true);
+        blockFromMesh.startMesh = molaMesh;
     }
 }
