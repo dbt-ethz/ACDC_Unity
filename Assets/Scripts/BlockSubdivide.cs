@@ -6,9 +6,6 @@ using System.Linq;
 
 public class BlockSubdivide : MolaMonoBehaviour
 {
-    public float dimX = 274;
-    public float dimY = 80;
-    public float dimZ = 200;
     [Range(1, 5)]
     public int iteration = 3;
     [Range(0, 10)]

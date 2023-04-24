@@ -10,9 +10,6 @@ public class LOD2_Voxel : MolaMonoBehaviour
     [Range(0.1f, 10)]
     public float scale = 3;
 
-    [HideInInspector]
-    public MolaMesh startMesh;
-
     void Start()
     {
         InitMesh();

@@ -56,7 +56,7 @@ MonoBehaviour:
   - {fileID: 4144898195387450594}
   - {fileID: 5471778748511030411}
   - {fileID: 4883251388803208178}
-  DimX: 33.2
+  DimX: 41.3
   DimY: 27.9
   DimZ: 21.4
 --- !u!205 &3483862476059655195
@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unityMesh: {fileID: 0}
-  dimX: 33.2
+  dimX: 41.3
   dimY: 27.9
   dimZ: 21.4
   seed: 4
